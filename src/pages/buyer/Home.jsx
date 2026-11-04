@@ -146,7 +146,7 @@ export default function Home() {
         <div className="row g-3">
           {CATEGORIES.map(c => (
             <div key={c.id} className="col-6 col-md-3">
-              <Link to={`/search?cat=${encodeURIComponent(c.name)}`} className="ta-card ta-cat-tile d-block h-100 p-2" style={{ overflow: 'hidden' }}>
+              <Link to={`/search?cat=${encodeURIComponent(c.name)}`} className="ta-card ta-card-category ta-cat-tile d-block h-100 p-2" style={{ overflow: 'hidden' }}>
                 <div className="ta-arch-top">
                   <img src={placeholder(c.id, c.name, 1.6)} alt="" style={{ width: '100%', height: 104, objectFit: 'cover', display: 'block' }} />
                 </div>

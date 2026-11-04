@@ -66,6 +66,7 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
   border: 1px solid var(--ta-line);
   border-radius: var(--ta-radius);
   box-shadow: var(--ta-shadow);
+  border-radius: 46% 46% 4px 4px / 22% 22% 4px 4px;
 }
 .ta-card-pad { padding: 1.25rem; }
 .ta-card-head {
@@ -370,7 +371,7 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
   content: "";
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 52px;
+  height: 25%;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='64' viewBox='0 0 60 64'%3E%3Cpath d='M3 64 V31 C3 15 14 3 30 3 C46 3 57 15 57 31 V64' fill='none' stroke='%23bb8f33' stroke-opacity='.28' stroke-width='1.6'/%3E%3Cpath d='M30 10 l5 7 -5 7 -5 -7 z' fill='%23bb8f33' fill-opacity='.22'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-position: bottom center;
@@ -379,8 +380,12 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
 
 /* Bingkai foto berujung lengkung untuk ubin kategori */
 .ta-arch-top {
-  border-radius: 46% 46% 4px 4px / 22% 22% 4px 4px;
+  border-radius: 50% 50% 4px 4px / 30% 30% 4px 4px;
   overflow: hidden;
+}
+
+.ta-card-category .ta-arch-top {
+  border-radius: 50% 50% 4px 4px / 30% 30% 4px 4px;
 }
 
 /* Garis pemisah emas dengan belah ketupat di tengah */
@@ -425,7 +430,6 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
 /* Hero: hijau tua bertekstur dengan garis emas di tepi atas */
 .ta-hero {
   position: relative;
-  background: linear-gradient(160deg, var(--ta-brand) 0%, var(--ta-brand-deep) 100%);
   border-top: 3px solid var(--ta-accent);
 }
 .ta-hero > * { position: relative; z-index: 1; }
