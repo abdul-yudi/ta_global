@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../data/store';
 import { Rating } from './ui';
@@ -42,13 +42,13 @@ export default function ProductCard({ product, compact = false }) {
           <>
             <div className="d-flex align-items-center gap-2">
               <Rating value={product.rating} />
-              <span className="ta-xs ta-faint">Â· {num(product.sold)} terjual</span>
+              <span className="ta-xs ta-faint">· {num(product.sold)} terjual</span>
             </div>
             <div className="ta-xs ta-faint d-flex align-items-center gap-1 mt-auto pt-1">
               <i className="bi bi-shop" />
               <span className="text-truncate">{s?.name}</span>
             </div>
-            <div className="ta-xs ta-muted">MOQ {product.moq} pcs Â· kirim ke seluruh dunia</div>
+            <div className="ta-xs ta-muted">MOQ {product.moq} pcs · kirim ke seluruh dunia</div>
           </>
         )}
       </div>

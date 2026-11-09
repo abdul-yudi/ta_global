@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, num } from '../../data/store';
 import { CATEGORIES, HUBS } from '../../data/mock';
@@ -152,7 +152,7 @@ export default function Home() {
                 </div>
                 <div className="px-2 pt-2 pb-1 text-center">
                   <div className="fw-semibold ta-sm">{c.name}</div>
-                  <div className="ta-xs ta-faint text-truncate">{c.sub.slice(0, 3).join(' Â· ')}</div>
+                  <div className="ta-xs ta-faint text-truncate">{c.sub.slice(0, 3).join(' · ')}</div>
                 </div>
               </Link>
             </div>

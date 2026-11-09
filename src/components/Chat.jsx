@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import $ from 'jquery';
 import { useStore } from '../data/store';
 import { api } from '../api/client';
@@ -111,7 +111,7 @@ export default function Chat({ role = 'buyer', filter }) {
                 <div className="flex-grow-1" style={{ minWidth: 0 }}>
                   <div className="ta-sm fw-semibold text-truncate">{active.with}</div>
                   <div className="ta-xs ta-faint text-truncate">
-                    {active.online ? <><span className="ta-dot me-1" style={{ background: 'var(--ta-ok)' }} />{t.online} Â· </> : ''}
+                    {active.online ? <><span className="ta-dot me-1" style={{ background: 'var(--ta-ok)' }} />{t.online} · </> : ''}
                     {active.subject}
                   </div>
                 </div>

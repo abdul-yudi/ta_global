@@ -449,6 +449,182 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
 .ta-prod:hover { border-color: var(--ta-accent); box-shadow: 0 2px 14px rgba(187, 143, 51, .14); }
 .ta-price { color: var(--ta-brand); }
 
+/* ============================================================
+   Komponen Autentikasi (Halaman Login, Daftar & Modal)
+   Mengusung estetika Blok A Tanah Abang (Giok, Emas, Krem)
+   ============================================================ */
+.ta-auth-card {
+  background: var(--ta-surface);
+  border: 1px solid var(--ta-cream-line);
+  border-radius: 16px;
+  box-shadow: 0 16px 44px -8px rgba(18, 84, 58, .14), 0 2px 10px rgba(23, 24, 26, .04);
+  overflow: hidden;
+}
+
+.ta-auth-hero {
+  background: linear-gradient(165deg, #13553b 0%, #092f20 100%);
+  color: #ffffff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-top: 3.5px solid var(--ta-accent);
+}
+
+.ta-auth-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ta-auth-medallion {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(187, 143, 51, 0.22) 0%, rgba(187, 143, 51, 0.05) 100%);
+  border: 1.5px solid rgba(187, 143, 51, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  flex: none;
+}
+
+.ta-auth-feature-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--ta-radius-sm);
+}
+
+.ta-auth-feature-box:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(187, 143, 51, 0.4);
+}
+
+.ta-auth-stat-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--ta-radius-sm);
+  padding: 0.55rem 0.75rem;
+  text-align: center;
+  flex: 1;
+}
+
+.ta-auth-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.844rem;
+  font-weight: 550;
+  color: var(--ta-ink-soft);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--ta-radius-sm);
+  border: 1px solid transparent;
+}
+
+.ta-auth-nav-link:hover {
+  color: var(--ta-brand);
+  background: var(--ta-surface);
+  border-color: var(--ta-line);
+}
+
+/* Tab Segmented Control */
+.ta-auth-tabs {
+  display: flex;
+  background: var(--ta-canvas);
+  border: 1px solid var(--ta-line);
+  border-radius: 9px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.ta-auth-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.844rem;
+  font-weight: 600;
+  color: var(--ta-ink-soft);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.ta-auth-tab-btn:hover {
+  color: var(--ta-ink);
+}
+
+.ta-auth-tab-btn.active {
+  background: var(--ta-surface);
+  color: var(--ta-brand);
+  box-shadow: 0 1px 4px rgba(20, 22, 26, 0.08);
+}
+
+/* Inputs dengan ikon kontekstual di kiri */
+.ta-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ta-input-wrap .ta-input-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ta-ink-faint);
+  font-size: 0.95rem;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.ta-input-wrap .form-control,
+.ta-input-wrap .form-select {
+  padding-left: 2.35rem;
+  min-height: 40px;
+}
+
+.ta-input-wrap .form-control:focus ~ .ta-input-icon,
+.ta-input-wrap .form-select:focus ~ .ta-input-icon {
+  color: var(--ta-brand);
+}
+
+.ta-auth-eye-btn {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--ta-ink-faint);
+  padding: 0.3rem 0.55rem;
+  border-radius: 5px;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.ta-auth-eye-btn:hover {
+  color: var(--ta-ink);
+  background: var(--ta-line-soft);
+}
+
+.ta-auth-trust-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--ta-ink-faint);
+  flex-wrap: wrap;
+}
+
+
 /* Lencana kios terverifikasi bergaya stempel pasar */
 .ta-crest {
   display: inline-flex; align-items: center; gap: .35rem;
