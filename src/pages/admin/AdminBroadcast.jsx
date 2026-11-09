@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useStore, num } from '../../data/store';
 import { COUNTRIES, CATEGORIES } from '../../data/mock';
 import { PageHead, Card, Modal } from '../../components/ui';
+import { api } from '../../api/client';
 
 const SENT = [
   ['2026-11-01 09:00', 'Semua penjual', 'Kalender ekspor Ramadan 2027', 1074, '68%'],
-  ['2026-10-24 14:30', 'Pembeli — kawasan Teluk', 'Gratis ongkir DHL di atas $120 minggu ini', 8412, '42%'],
-  ['2026-10-18 08:15', 'Penjual — Blok A', 'Perubahan jam buka loket gerai', 418, '81%'],
+  ['2026-10-24 14:30', 'Pembeli â€” kawasan Teluk', 'Gratis ongkir DHL di atas $120 minggu ini', 8412, '42%'],
+  ['2026-10-18 08:15', 'Penjual â€” Blok A', 'Perubahan jam buka loket gerai', 418, '81%'],
   ['2026-10-09 11:00', 'Semua pembeli', 'Perubahan aturan bea cukai untuk kiriman Uni Eropa', 23190, '37%'],
 ];
 
@@ -16,6 +17,7 @@ export default function AdminBroadcast() {
   const [filters, setFilters] = useState({ status: '', block: '', category: '', country: '' });
   const [msg, setMsg] = useState({ subject: '', body: '', channel: ['inbox', 'email'], schedule: 'now' });
   const [preview, setPreview] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const reach = aud === 'sellers'
     ? state.sellers.filter(s => !filters.status || s.status === filters.status).length * 179
@@ -33,17 +35,20 @@ export default function AdminBroadcast() {
         <button className="btn btn-ta-outline" onClick={() => setPreview(true)}>
           <i className="bi bi-eye me-1" />Pratinjau
         </button>
-        <button className="btn btn-ta" onClick={() => {
+        <button className="btn btn-ta" disabled={sending} onClick={async () => {
           if (!msg.subject || !msg.body) { toast('Perihal dan isi pesan wajib diisi', 'warn'); return; }
-          toast(`Siaran diantrekan untuk ${num(reach)} penerima`);
+          setSending(true);
+          try { const result = await api('/admin/broadcast', { method: 'POST', body: { subject: msg.subject, message: msg.body, audience: aud } }); toast(`Siaran terkirim ke ${num(result.delivered)} akun`); }
+          catch (error) { toast(error.message, 'danger'); }
+          finally { setSending(false); }
         }}>
-          <i className="bi bi-send me-1" />Kirim siaran
+          <i className="bi bi-send me-1" />{sending ? 'Mengirim…' : 'Kirim siaran'}
         </button>
       </PageHead>
 
       <div className="row g-3">
         <div className="col-xl-8 d-grid gap-3">
-          <Card title="1 · Penerima">
+          <Card title="1 Â· Penerima">
             <div className="row g-2 mb-3">
               {[['sellers', 'Penjual', 'bi-shop', 'Toko yang berjualan di marketplace'],
                 ['buyers', 'Pembeli', 'bi-bag', 'Pelanggan yang pernah memesan']].map(([id, t, i, d]) => (
@@ -127,14 +132,14 @@ export default function AdminBroadcast() {
             </div>
           </Card>
 
-          <Card title="2 · Isi pesan">
+          <Card title="2 Â· Isi pesan">
             <label className="form-label">Perihal</label>
             <input className="form-control mb-3" value={msg.subject} maxLength={90}
               placeholder={aud === 'sellers' ? 'Jasa kirim baru tersedia: Aramex' : 'Gratis ongkir DHL di atas $120 minggu ini'}
               onChange={e => setMsg({ ...msg, subject: e.target.value })} />
             <label className="form-label">Isi pesan</label>
             <textarea className="form-control mb-3" rows="8" value={msg.body}
-              placeholder="Tulis pengumumannya. Buat ringkas — pratinjau kotak masuk hanya menampilkan 120 karakter pertama."
+              placeholder="Tulis pengumumannya. Buat ringkas â€” pratinjau kotak masuk hanya menampilkan 120 karakter pertama."
               onChange={e => setMsg({ ...msg, body: e.target.value })} />
             <div className="row g-3">
               <div className="col-md-6">
@@ -196,7 +201,7 @@ export default function AdminBroadcast() {
                     <div className="ta-xs fw-semibold mt-1">{msg.subject || 'Perihal Anda muncul di sini'}</div>
                     <div className="ta-xs ta-faint mt-1">
                       {(msg.body || 'Beberapa baris pertama pesan Anda tampil di daftar kotak masuk penerima, jadi tulis informasi terpenting di awal.').slice(0, 130)}
-                      {msg.body.length > 130 ? '…' : ''}
+                      {msg.body.length > 130 ? 'â€¦' : ''}
                     </div>
                   </div>
                 </div>
@@ -240,7 +245,7 @@ export default function AdminBroadcast() {
           </div>
           <hr className="ta-sep my-3" />
           <div className="ta-xs ta-faint">
-            Dikirim ke {num(reach)} {audLabel} · saluran: {msg.channel.join(', ') || 'belum dipilih'} ·
+            Dikirim ke {num(reach)} {audLabel} Â· saluran: {msg.channel.join(', ') || 'belum dipilih'} Â·
             {msg.schedule === 'now' ? ' langsung' : ' terjadwal'}
           </div>
         </div>
@@ -248,3 +253,7 @@ export default function AdminBroadcast() {
     </>
   );
 }
+
+
+
+

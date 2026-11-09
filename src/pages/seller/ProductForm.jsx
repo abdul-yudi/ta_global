@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useStore, usd } from '../../data/store';
 import { CATEGORIES, placeholder } from '../../data/mock';
@@ -54,7 +54,7 @@ export default function ProductForm() {
     toast('Foto ditambahkan ke galeri', 'info');
   };
 
-  const save = status => {
+  const save = async status => {
     if (!f.title || !f.price) { toast('Nama produk dan harga wajib diisi', 'warn'); return; }
     const payload = {
       id: existing?.id || 'pr' + Math.floor(Math.random() * 9000 + 1000),
@@ -76,16 +76,16 @@ export default function ProductForm() {
         ['Customs code', f.hs],
       ],
     };
-    dispatch({ type: editing ? 'product:update' : 'product:create', product: payload });
+    await dispatch({ type: editing ? 'product:update' : 'product:create', product: payload });
     toast(editing ? 'Produk diperbarui' : status === 'draft' ? 'Disimpan sebagai draf' : 'Produk tayang di etalase');
     nav('/seller/products');
   };
 
   return (
     <>
-      <PageHead eyebrow={editing ? 'Katalog · ubah' : 'Katalog · produk baru'}
+      <PageHead eyebrow={editing ? 'Katalog Â· ubah' : 'Katalog Â· produk baru'}
         title={editing ? 'Ubah produk' : 'Unggah produk'}
-        sub="Semua yang dibutuhkan pembeli di luar negeri — foto, harga grosir, berat dan data bea cukai.">
+        sub="Semua yang dibutuhkan pembeli di luar negeri â€” foto, harga grosir, berat dan data bea cukai.">
         <Link to="/seller/products" className="btn btn-ta-outline">Batal</Link>
         <button className="btn btn-ta-outline" onClick={() => save('draft')}>Simpan draf</button>
         <button className="btn btn-ta" onClick={() => save('active')}>
@@ -96,12 +96,12 @@ export default function ProductForm() {
       <div className="row g-3">
         <div className="col-xl-8 d-grid gap-3">
           {/* ---------- basics ---------- */}
-          <Card title="1 · Informasi dasar">
+          <Card title="1 Â· Informasi dasar">
             <div className="row g-3">
               <div className="col-12">
                 <label className="form-label">Nama produk</label>
                 <input className="form-control" value={f.title} maxLength={140}
-                  placeholder="mis. Premium Voal Pashmina Hijab — Soft Finish, 20 Pilihan Warna"
+                  placeholder="mis. Premium Voal Pashmina Hijab â€” Soft Finish, 20 Pilihan Warna"
                   onChange={e => set('title', e.target.value)} />
                 <div className="form-text d-flex justify-content-between">
                   <span>Tulis bahan dulu, lalu modelnya, lalu jumlah pilihan warnanya.</span>
@@ -132,9 +132,9 @@ export default function ProductForm() {
               <div className="col-12">
                 <label className="form-label">Deskripsi</label>
                 <textarea className="form-control" rows="6" value={f.desc}
-                  placeholder="Jelaskan bahan, jahitan, cara cuci, ketahanan warna dan isi satu karton…"
+                  placeholder="Jelaskan bahan, jahitan, cara cuci, ketahanan warna dan isi satu kartonâ€¦"
                   onChange={e => set('desc', e.target.value)} />
-                <div className="form-text">Pembeli di luar negeri tidak bisa memegang kainnya — sebutkan gramasi, kelenturan dan ketebalan.</div>
+                <div className="form-text">Pembeli di luar negeri tidak bisa memegang kainnya â€” sebutkan gramasi, kelenturan dan ketebalan.</div>
               </div>
               <div className="col-12">
                 <label className="form-label">Label unggulan</label>
@@ -151,7 +151,7 @@ export default function ProductForm() {
                   {!f.tags.length && <span className="ta-xs ta-faint">Belum ada label</span>}
                 </div>
                 <div className="input-group" style={{ maxWidth: 340 }}>
-                  <input className="form-control form-control-sm" placeholder="Ready Stock, Best Seller, Grosir…"
+                  <input className="form-control form-control-sm" placeholder="Ready Stock, Best Seller, Grosirâ€¦"
                     value={newTag} onChange={e => setNewTag(e.target.value)} />
                   <button className="btn btn-ta-outline btn-sm" onClick={() => { if (newTag.trim()) { set('tags', [...f.tags, newTag.trim()]); setNewTag(''); } }}>
                     Tambah
@@ -162,11 +162,11 @@ export default function ProductForm() {
           </Card>
 
           {/* ---------- media ---------- */}
-          <Card title="2 · Foto & media" action={<span className="ta-xs ta-faint">{images.length}/8 foto</span>}>
+          <Card title="2 Â· Foto & media" action={<span className="ta-xs ta-faint">{images.length}/8 foto</span>}>
             <div className="ta-dropzone mb-3" onClick={addMockImage} role="button">
               <i className="bi bi-cloud-arrow-up" style={{ fontSize: '1.6rem' }} />
               <div className="fw-semibold mt-2">Tarik foto ke sini atau klik untuk menambah</div>
-              <div className="ta-xs ta-faint">JPG atau PNG, rasio 1:1, minimal 800×800 px, latar putih atau netral</div>
+              <div className="ta-xs ta-faint">JPG atau PNG, rasio 1:1, minimal 800Ã—800 px, latar putih atau netral</div>
             </div>
             <div className="row g-2">
               {images.map((src, i) => (
@@ -186,12 +186,12 @@ export default function ProductForm() {
             </div>
             <hr className="ta-sep my-3" />
             <label className="form-label">URL video produk <span className="ta-faint fw-normal">(opsional)</span></label>
-            <input className="form-control" placeholder="https://…" />
+            <input className="form-control" placeholder="https://â€¦" />
             <div className="form-text">Klip 15 detik yang memperlihatkan jatuhnya kain terbukti menaikkan konversi tekstil.</div>
           </Card>
 
           {/* ---------- pricing ---------- */}
-          <Card title="3 · Harga & stok">
+          <Card title="3 Â· Harga & stok">
             <div className="row g-3">
               <div className="col-md-4">
                 <label className="form-label">Harga satuan (USD)</label>
@@ -242,7 +242,7 @@ export default function ProductForm() {
                             </div>
                           </td>
                           <td className="ta-sm ta-faint">
-                            {f.price && t.price ? `${Math.max(0, Math.round((1 - t.price / f.price) * 100))}% dari harga normal` : '—'}
+                            {f.price && t.price ? `${Math.max(0, Math.round((1 - t.price / f.price) * 100))}% dari harga normal` : 'â€”'}
                           </td>
                           <td className="text-end">
                             <button className="btn btn-ta-ghost btn-sm" onClick={() => set('tiers', f.tiers.filter((_, k) => k !== i))}>
@@ -302,7 +302,7 @@ export default function ProductForm() {
           </Card>
 
           {/* ---------- logistics ---------- */}
-          <Card title="4 · Pengiriman & bea cukai">
+          <Card title="4 Â· Pengiriman & bea cukai">
             <div className="row g-3">
               <div className="col-md-3">
                 <label className="form-label">Berat satuan (kg)</label>
@@ -343,7 +343,7 @@ export default function ProductForm() {
                         <div>
                           <div className="ta-sm fw-semibold">{p.name}</div>
                           <div className="ta-xs ta-faint">
-                            {p.service} · {p.etaMin}-{p.etaMax} hari · mulai {usd(p.baseRate)}
+                            {p.service} Â· {p.etaMin}-{p.etaMax} hari Â· mulai {usd(p.baseRate)}
                           </div>
                         </div>
                       </div>
@@ -404,7 +404,7 @@ export default function ProductForm() {
                     {f.oldPrice && <span className="ta-price-old">{usd(+f.oldPrice)}</span>}
                   </div>
                   <div className="ta-prod-title">{f.title || 'Nama produk Anda muncul di sini'}</div>
-                  <div className="ta-xs ta-faint">MOQ {f.moq || 1} pcs · kirim ke seluruh dunia</div>
+                  <div className="ta-xs ta-faint">MOQ {f.moq || 1} pcs Â· kirim ke seluruh dunia</div>
                 </div>
               </div>
             </Card>
@@ -434,3 +434,6 @@ export default function ProductForm() {
     </>
   );
 }
+
+
+

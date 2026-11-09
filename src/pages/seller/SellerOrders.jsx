@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { PageHead, Card, StatusBadge, ProviderLogo, Empty, Modal, FakeQR } from '../../components/ui';
@@ -31,14 +31,14 @@ export default function SellerOrders() {
     : id === 'shipped' ? sellerOrders.filter(o => shipped.includes(o.status)).length
       : sellerOrders.filter(o => o.status === id).length);
 
-  const accept = o => {
-    dispatch({ type: 'order:status', orderId: o.id, status: 'to_dropoff', stage: 1 });
-    toast(`${o.id} diterima — kemas dan antar ke gerai sebelum pukul 15:00`);
+  const accept = async o => {
+    await dispatch({ type: 'order:status', orderId: o.id, status: 'to_dropoff', stage: 1 });
+    toast(`${o.id} diterima â€” kemas dan antar ke gerai sebelum pukul 15:00`);
   };
-  const markDropped = o => {
+  const markDropped = async o => {
     const awb = (provider(o.provider)?.code || 'TA') + Math.floor(1000000000 + Math.random() * 8999999999);
-    dispatch({ type: 'order:status', orderId: o.id, status: 'at_hub', stage: 2, awb });
-    toast(`${o.id} dipindai di gerai — nomor resi ${awb} terbit`);
+    await dispatch({ type: 'order:status', orderId: o.id, status: 'at_hub', stage: 2, awb });
+    toast(`${o.id} dipindai di gerai â€” nomor resi ${awb} terbit`);
   };
 
   return (
@@ -112,9 +112,9 @@ export default function SellerOrders() {
                           <img src={p.images[0]} alt="" className="ta-thumb-lg" />
                           <div className="flex-grow-1" style={{ minWidth: 0 }}>
                             <div className="ta-sm fw-semibold">{p.title}</div>
-                            <div className="ta-xs ta-faint">{p.sku} · {it.variant}</div>
+                            <div className="ta-xs ta-faint">{p.sku} Â· {it.variant}</div>
                             <div className="ta-xs ta-muted mt-1">
-                              <strong>{it.qty} pcs</strong> × {usd(p.price)} · sisa stok setelah kirim {num(Math.max(0, p.stock - it.qty))}
+                              <strong>{it.qty} pcs</strong> Ã— {usd(p.price)} Â· sisa stok setelah kirim {num(Math.max(0, p.stock - it.qty))}
                             </div>
                           </div>
                         </div>
@@ -127,7 +127,7 @@ export default function SellerOrders() {
                     <div className="ta-xs ta-muted">{o.address}</div>
                     <div className="ta-eyebrow mt-3 mb-1">Kurir pilihan pembeli</div>
                     <div className="ta-sm">{pv?.name}</div>
-                    <div className="ta-xs ta-faint">{pv?.service} · {pv?.etaMin}-{pv?.etaMax} hari</div>
+                    <div className="ta-xs ta-faint">{pv?.service} Â· {pv?.etaMin}-{pv?.etaMax} hari</div>
                   </div>
                   <div className="col-lg-3">
                     <div className="ta-flat p-3">
@@ -196,7 +196,7 @@ export default function SellerOrders() {
             <button className="btn btn-ta-outline btn-sm" onClick={() => setReject(null)}>Batal</button>
             <button className="btn btn-ta-danger btn-sm" onClick={() => {
               dispatch({ type: 'order:status', orderId: reject.id, status: 'cancelled', stage: 0 });
-              toast(`${reject.id} ditolak — dana pembeli dikembalikan penuh`, 'warn');
+              toast(`${reject.id} ditolak â€” dana pembeli dikembalikan penuh`, 'warn');
               setReject(null);
             }}>Tolak &amp; kembalikan dana</button>
           </>
@@ -212,7 +212,7 @@ export default function SellerOrders() {
           <option>Tidak sanggup memenuhi jumlah pesanan</option>
         </select>
         <label className="form-label">Pesan untuk pembeli</label>
-        <textarea className="form-control" rows="3" defaultValue="Mohon maaf, warna ini baru saja habis di toko. Saya punya warna yang mirip — boleh saya kirim fotonya?" />
+        <textarea className="form-control" rows="3" defaultValue="Mohon maaf, warna ini baru saja habis di toko. Saya punya warna yang mirip â€” boleh saya kirim fotonya?" />
       </Modal>
 
       {/* ---------- label modal ---------- */}
@@ -246,11 +246,11 @@ export default function SellerOrders() {
                 <div className="ta-eyebrow mt-3 mb-1">Kurir</div>
                 <div className="d-flex align-items-center gap-2">
                   <ProviderLogo code={provider(label.provider)?.logo} />
-                  <span className="ta-sm">{provider(label.provider)?.name} · {provider(label.provider)?.service}</span>
+                  <span className="ta-sm">{provider(label.provider)?.name} Â· {provider(label.provider)?.service}</span>
                 </div>
                 <div className="ta-eyebrow mt-3 mb-1">Antar ke</div>
                 <div className="ta-sm">{hub(state.sellerHub)?.name}</div>
-                <div className="ta-xs ta-faint">{hub(state.sellerHub)?.address} · cut-off {hub(state.sellerHub)?.cutoff}</div>
+                <div className="ta-xs ta-faint">{hub(state.sellerHub)?.address} Â· cut-off {hub(state.sellerHub)?.cutoff}</div>
               </div>
               <div className="col-5 text-center">
                 <FakeQR seed={label.id} />
@@ -296,3 +296,4 @@ export default function SellerOrders() {
     </>
   );
 }
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { PageHead, Card, Empty, Modal, ConfirmDialog, Rating, useTableFilter } from '../../components/ui';
@@ -23,8 +23,8 @@ export default function AdminSellers() {
   const count = id => (id === 'all' ? state.sellers.length : state.sellers.filter(s => s.status === id).length);
   const productsOf = sid => state.products.filter(p => p.sellerId === sid);
 
-  const save = () => {
-    dispatch({ type: 'seller:update', seller: edit });
+  const save = async () => {
+    await dispatch({ type: 'seller:update', seller: edit });
     toast(`${edit.name} diperbarui`);
     setEdit(null);
   };
@@ -32,7 +32,7 @@ export default function AdminSellers() {
   return (
     <>
       <PageHead eyebrow="Marketplace" title="Penjual"
-        sub="Pantau setiap toko beserta katalognya — ubah, tangguhkan atau hapus">
+        sub="Pantau setiap toko beserta katalognya â€” ubah, tangguhkan atau hapus">
         <div className="input-group input-group-sm" style={{ width: 250 }}>
           <span className="input-group-text"><i className="bi bi-search" /></span>
           <input className="form-control" placeholder="Cari nama, pemilik, blok" value={q} onChange={e => setQ(e.target.value)} />
@@ -86,7 +86,7 @@ export default function AdminSellers() {
                         <span className="ta-avatar">{s.name.slice(0, 2).toUpperCase()}</span>
                         <div style={{ minWidth: 0 }}>
                           <div className="ta-sm fw-semibold">{s.name}</div>
-                          <div className="ta-xs ta-faint">{s.owner} · {s.email}</div>
+                          <div className="ta-xs ta-faint">{s.owner} Â· {s.email}</div>
                         </div>
                       </div>
                     </td>
@@ -167,7 +167,7 @@ export default function AdminSellers() {
               <div className="ta-flat p-3">
                 <div className="ta-eyebrow mb-2">Catatan moderasi</div>
                 <textarea className="form-control" rows="3"
-                  placeholder="Catatan internal — tidak terlihat oleh penjual" />
+                  placeholder="Catatan internal â€” tidak terlihat oleh penjual" />
               </div>
             </div>
             {edit.status === 'suspended' && (
@@ -183,7 +183,7 @@ export default function AdminSellers() {
       </Modal>
 
       {/* ---------- seller catalogue ---------- */}
-      <Modal open={!!view} onClose={() => setView(null)} title={`Katalog — ${view?.name || ''}`} size="modal-xl">
+      <Modal open={!!view} onClose={() => setView(null)} title={`Katalog â€” ${view?.name || ''}`} size="modal-xl">
         {view && (
           <>
             <div className="row g-3 mb-3">
@@ -203,7 +203,7 @@ export default function AdminSellers() {
                           <img src={p.images[0]} alt="" className="ta-thumb" />
                           <div style={{ maxWidth: 320 }}>
                             <div className="ta-sm fw-semibold text-truncate">{p.title}</div>
-                            <div className="ta-xs ta-faint">{p.sku} · {p.category}</div>
+                            <div className="ta-xs ta-faint">{p.sku} Â· {p.category}</div>
                           </div>
                         </div>
                       </td>
@@ -268,7 +268,7 @@ export default function AdminSellers() {
         </select>
         <label className="form-label">Pesan</label>
         <textarea className="form-control" rows="5" value={msgText} onChange={e => setMsgText(e.target.value)}
-          placeholder="Tulis pesan untuk penjual…" />
+          placeholder="Tulis pesan untuk penjualâ€¦" />
       </Modal>
 
       <ConfirmDialog open={!!del} onClose={() => setDel(null)}
@@ -279,3 +279,6 @@ export default function AdminSellers() {
     </>
   );
 }
+
+
+

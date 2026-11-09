@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { PageHead, Card, ProviderLogo, Empty, Modal, ConfirmDialog } from '../../components/ui';
@@ -15,7 +15,7 @@ export default function AdminProviders() {
   const [form, setForm] = useState(null);
   const [del, setDel] = useState(null);
 
-  const save = () => {
+  const save = async () => {
     if (!form.name || !form.code) { toast('Nama dan kode wajib diisi', 'warn'); return; }
     const payload = {
       ...form,
@@ -273,3 +273,7 @@ export default function AdminProviders() {
     </>
   );
 }
+
+
+
+

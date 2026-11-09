@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useStore, usd, num } from '../../data/store';
 import { PageHead, Card, Rating } from '../../components/ui';
 
 export default function SellerSettings() {
   const { state, seller, dispatch, toast } = useStore();
-  const me = seller(state.sellerId);
+  const me = seller(state.sellerId) || { id: state.sellerId, name: 'Toko', owner: '', block: '', email: '', phone: '' };
   const [tab, setTab] = useState('store');
   const [f, setF] = useState({
     name: me.name, owner: me.owner, block: me.block, email: me.email, phone: me.phone,
     about: 'Spesialis hijab dan kerudung di lantai 1 Blok B. Produksi sendiri dan memasok butik di kawasan Teluk serta Asia Tenggara.',
-    bank: 'BCA', account: '••••••4821', holder: me.owner, npwp: '09.254.118.7-021.000',
+    bank: 'BCA', account: 'â€¢â€¢â€¢â€¢â€¢â€¢4821', holder: me.owner, npwp: '09.254.118.7-021.000',
     vacation: false, autoAccept: true,
   });
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
 
   return (
     <>
-      <PageHead eyebrow="Relasi" title="Pengaturan toko" sub={`${me.name} · ${me.block}`}>
+      <PageHead eyebrow="Relasi" title="Pengaturan toko" sub={`${me.name} Â· ${me.block}`}>
         <button className="btn btn-ta" onClick={() => {
           dispatch({ type: 'seller:update', seller: { id: me.id, name: f.name, owner: f.owner, block: f.block, email: f.email, phone: f.phone } });
           toast('Pengaturan toko disimpan');
@@ -92,7 +92,7 @@ export default function SellerSettings() {
                   </div>
                   <div className="form-check form-switch mb-0">
                     <input className="form-check-input" type="checkbox" checked={f.vacation}
-                      onChange={e => { set('vacation', e.target.checked); toast(e.target.checked ? 'Mode libur aktif — produk disembunyikan' : 'Mode libur dimatikan', 'info'); }} />
+                      onChange={e => { set('vacation', e.target.checked); toast(e.target.checked ? 'Mode libur aktif â€” produk disembunyikan' : 'Mode libur dimatikan', 'info'); }} />
                   </div>
                 </div>
                 <div className="ta-toggle-row">
@@ -119,7 +119,7 @@ export default function SellerSettings() {
                   <div className="col-md-4">
                     <label className="form-label">Nomor rekening</label>
                     <input className="form-control ta-mono" value={f.account} readOnly />
-                    <div className="form-text">Disamarkan demi keamanan — hubungi CS untuk mengubah.</div>
+                    <div className="form-text">Disamarkan demi keamanan â€” hubungi CS untuk mengubah.</div>
                   </div>
                   <div className="col-md-4">
                     <label className="form-label">Nama pemilik rekening</label>
@@ -131,8 +131,8 @@ export default function SellerSettings() {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Jadwal pencairan</label>
-                    <select className="form-select" defaultValue="Mingguan — setiap Senin">
-                      <option>Mingguan — setiap Senin</option>
+                    <select className="form-select" defaultValue="Mingguan â€” setiap Senin">
+                      <option>Mingguan â€” setiap Senin</option>
                       <option>Dua mingguan</option>
                       <option>Bulanan</option>
                     </select>
@@ -146,16 +146,16 @@ export default function SellerSettings() {
                     <thead><tr><th>Periode</th><th>Pesanan</th><th>Bruto</th><th>Komisi</th><th>Diterima</th><th>Status</th></tr></thead>
                     <tbody>
                       {[
-                        ['27 Okt – 2 Nov', 44, 10420.5, 'Cair'],
-                        ['20 Okt – 26 Okt', 38, 8940.0, 'Cair'],
-                        ['13 Okt – 19 Okt', 41, 9612.4, 'Cair'],
-                        ['3 Nov – 9 Nov', 29, 8771.4, 'Terjadwal'],
+                        ['27 Okt â€“ 2 Nov', 44, 10420.5, 'Cair'],
+                        ['20 Okt â€“ 26 Okt', 38, 8940.0, 'Cair'],
+                        ['13 Okt â€“ 19 Okt', 41, 9612.4, 'Cair'],
+                        ['3 Nov â€“ 9 Nov', 29, 8771.4, 'Terjadwal'],
                       ].map(([per, ord, gross, st]) => (
                         <tr key={per}>
                           <td className="ta-sm">{per}</td>
                           <td className="ta-num">{ord}</td>
                           <td className="ta-num">{usd(gross)}</td>
-                          <td className="ta-num ta-faint">−{usd(gross * 0.04)}</td>
+                          <td className="ta-num ta-faint">âˆ’{usd(gross * 0.04)}</td>
                           <td className="ta-num fw-semibold">{usd(gross * 0.96)}</td>
                           <td><span className={`ta-badge ${st === 'Cair' ? 'ta-badge-ok' : 'ta-badge-info'}`}>{st}</span></td>
                         </tr>
@@ -275,3 +275,5 @@ export default function SellerSettings() {
     </>
   );
 }
+
+

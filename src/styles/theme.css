@@ -66,7 +66,7 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
   border: 1px solid var(--ta-line);
   border-radius: var(--ta-radius);
   box-shadow: var(--ta-shadow);
-  border-radius: 46% 46% 4px 4px / 22% 22% 4px 4px;
+  overflow: hidden;
 }
 .ta-card-pad { padding: 1.25rem; }
 .ta-card-head {
@@ -385,7 +385,7 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -.012em; color: var(--ta-ink); font-wei
 }
 
 .ta-card-category .ta-arch-top {
-  border-radius: 50% 50% 4px 4px / 30% 30% 4px 4px;
+  border-radius: 8px 8px 3px 3px;
 }
 
 /* Garis pemisah emas dengan belah ketupat di tengah */

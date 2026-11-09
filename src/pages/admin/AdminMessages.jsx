@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../data/store';
 import { PageHead, Modal } from '../../components/ui';
@@ -9,11 +9,11 @@ export default function AdminMessages() {
   const [compose, setCompose] = useState(false);
   const [to, setTo] = useState({ kind: 'seller', id: 's1', subject: 'Pemberitahuan umum', text: '' });
 
-  const send = () => {
+  const send = async () => {
     const name = to.kind === 'seller'
       ? state.sellers.find(s => s.id === to.id)?.name
       : state.orders.find(o => o.buyer === to.id)?.buyer || to.id;
-    dispatch({
+    await dispatch({
       type: 'thread:create',
       thread: {
         id: 't' + Date.now(), with: name, role: to.kind, subject: to.subject,
@@ -31,7 +31,7 @@ export default function AdminMessages() {
   return (
     <>
       <PageHead eyebrow="Komunikasi" title="Pesan"
-        sub="Kotak masuk customer service — percakapan dengan penjual dan pembeli">
+        sub="Kotak masuk customer service â€” percakapan dengan penjual dan pembeli">
         <Link to="/admin/broadcast" className="btn btn-ta-outline"><i className="bi bi-megaphone me-1" />Siaran</Link>
         <button className="btn btn-ta" onClick={() => setCompose(true)}>
           <i className="bi bi-pencil-square me-1" />Pesan baru
@@ -79,7 +79,7 @@ export default function AdminMessages() {
             <label className="form-label">Penerima</label>
             <select className="form-select" value={to.id} onChange={e => setTo({ ...to, id: e.target.value })}>
               {to.kind === 'seller'
-                ? state.sellers.map(s => <option key={s.id} value={s.id}>{s.name} — {s.owner} ({s.block})</option>)
+                ? state.sellers.map(s => <option key={s.id} value={s.id}>{s.name} â€” {s.owner} ({s.block})</option>)
                 : buyers.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
           </div>
@@ -109,13 +109,13 @@ export default function AdminMessages() {
             <label className="form-label">Pesan</label>
             <textarea className="form-control" rows="6" value={to.text}
               onChange={e => setTo({ ...to, text: e.target.value })}
-              placeholder="Tulis pesan Anda…" />
+              placeholder="Tulis pesan Andaâ€¦" />
             <div className="form-text">Dikirim ke kotak masuk aplikasi dan diteruskan ke email.</div>
           </div>
           <div className="col-12">
             <div className="ta-flat p-2 ta-xs ta-muted">
               <i className="bi bi-info-circle me-1" />
-              Pesan admin ditandai “CS TAGlobal” di kotak masuk penerima dan tidak dapat mereka hapus.
+              Pesan admin ditandai â€œCS TAGlobalâ€ di kotak masuk penerima dan tidak dapat mereka hapus.
             </div>
           </div>
         </div>
@@ -123,3 +123,4 @@ export default function AdminMessages() {
     </>
   );
 }
+

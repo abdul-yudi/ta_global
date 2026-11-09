@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
+import { api } from '../../api/client';
 import { useStore, num } from '../../data/store';
 import { PageHead, Card, Empty, Modal, BarRow } from '../../components/ui';
 
@@ -54,7 +55,7 @@ export default function AdminHubs() {
                     </div>
                     <div className="ta-xs ta-faint">{h.address}</div>
                     <div className="ta-xs ta-muted mt-1">
-                      <i className="bi bi-clock me-1" />{h.open} · batas penerimaan {h.cutoff}
+                      <i className="bi bi-clock me-1" />{h.open} Â· batas penerimaan {h.cutoff}
                     </div>
                   </div>
                   <div className="d-none d-md-block" style={{ width: 110 }}>
@@ -78,7 +79,7 @@ export default function AdminHubs() {
         </div>
 
         <div className="col-xl-4 d-grid gap-3">
-          <Card title="Porsi penerimaan — 30 hari">
+          <Card title="Porsi penerimaan â€” 30 hari">
             {state.hubs.map(h => (
               <BarRow key={h.id} label={h.name.replace('TAGlobal ', '').replace('Gerai - ', '')} value={h.intake30d} max={maxIntake} />
             ))}
@@ -111,7 +112,7 @@ export default function AdminHubs() {
         footer={(
           <>
             <button className="btn btn-ta-outline btn-sm" onClick={() => setForm(null)}>Batal</button>
-            <button className="btn btn-ta btn-sm" onClick={() => { toast(form?.id ? 'Gerai diperbarui' : 'Gerai ditambahkan ke jaringan'); setForm(null); }}>
+            <button className="btn btn-ta btn-sm" onClick={async () => { try { const hubs = await api('/admin/hubs'); const saved = { ...form, id: form.id || `h${Date.now()}`, sellers: form.sellers || 0, intake30d: form.intake30d || 0 }; await api('/admin/hubs', { method: 'PUT', body: form.id ? hubs.map(h => h.id === form.id ? saved : h) : [...hubs, saved] }); toast(form.id ? 'Gerai diperbarui' : 'Gerai ditambahkan ke jaringan'); setForm(null); window.location.reload(); } catch (e) { toast(e.message, 'danger'); } }}>
               Simpan
             </button>
           </>
@@ -125,7 +126,7 @@ export default function AdminHubs() {
             </div>
             <div className="col-12">
               <label className="form-label">Alamat</label>
-              <input className="form-control" value={form.address} placeholder="Blok F Lt. 1, Jl. …, Jakarta Pusat"
+              <input className="form-control" value={form.address} placeholder="Blok F Lt. 1, Jl. â€¦, Jakarta Pusat"
                 onChange={e => setForm({ ...form, address: e.target.value })} />
             </div>
             <div className="col-md-4">
@@ -149,3 +150,5 @@ export default function AdminHubs() {
     </>
   );
 }
+
+

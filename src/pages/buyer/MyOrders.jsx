@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd } from '../../data/store';
 import { StatusBadge, Empty, ProviderLogo, Modal } from '../../components/ui';
@@ -58,9 +58,9 @@ export default function MyOrders() {
 
       <div className="d-grid gap-3">
         {list.map(o => {
-          const s = seller(o.sellerId);
-          const pv = provider(o.provider);
-          const stepNow = o.tracking.find(t => t.state === 'active') || o.tracking[o.tracking.length - 1];
+          const s = seller(o.sellerId) || {name:"Penjual"};
+          const pv = provider(o.provider) || {name:"Kurir",logo:"TA",service:"",tracking:""};
+          const stepNow = o.tracking?.find(t => t.state === 'active') || o.tracking?.[o.tracking.length - 1] || {title:o.status,note:"Status pesanan",place:o.city,time:o.placed,state:"active"};
           return (
             <div key={o.id} className="ta-card">
               <div className="ta-card-head">
@@ -89,7 +89,7 @@ export default function MyOrders() {
                             <Link to={`/product/${p.id}`} className="ta-sm fw-semibold d-block text-truncate" style={{ color: 'var(--ta-ink)' }}>
                               {p.title}
                             </Link>
-                            <div className="ta-xs ta-faint">{it.variant} · {it.qty} pcs × {usd(p.price)}</div>
+                            <div className="ta-xs ta-faint">{it.variant} Â· {it.qty} pcs Ã— {usd(p.price)}</div>
                           </div>
                         </div>
                       ) : null;
@@ -108,7 +108,7 @@ export default function MyOrders() {
                         <i className="bi bi-geo-alt me-1" />{o.address}
                       </div>
                       <div className="ta-xs ta-muted mt-1">
-                        <i className="bi bi-activity me-1" />{stepNow?.title} — {stepNow?.place}
+                        <i className="bi bi-activity me-1" />{stepNow?.title} â€” {stepNow?.place}
                       </div>
                       <hr className="ta-sep my-2" />
                       <div className="d-flex justify-content-between ta-sm">
@@ -153,7 +153,7 @@ export default function MyOrders() {
         footer={(
           <>
             <button className="btn btn-ta-outline btn-sm" onClick={() => setReview(null)}>Batal</button>
-            <button className="btn btn-ta btn-sm" onClick={() => { setReview(null); toast('Terima kasih — ulasan Anda sudah tayang'); }}>
+            <button className="btn btn-ta btn-sm" onClick={() => { setReview(null); toast('Terima kasih â€” ulasan Anda sudah tayang'); }}>
               Kirim ulasan
             </button>
           </>
@@ -170,8 +170,9 @@ export default function MyOrders() {
         </div>
         <label className="form-label">Apa yang perlu diketahui pembeli lain?</label>
         <textarea className="form-control" rows="4" value={text} onChange={e => setText(e.target.value)}
-          placeholder="Kualitas bahan, pengemasan, kecepatan kios mengirim…" />
+          placeholder="Kualitas bahan, pengemasan, kecepatan kios mengirimâ€¦" />
       </Modal>
     </main>
   );
 }
+

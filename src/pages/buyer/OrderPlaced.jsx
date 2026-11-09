@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useStore, usd } from '../../data/store';
 import { Steps, Empty, ProviderLogo } from '../../components/ui';
@@ -11,8 +11,8 @@ export default function OrderPlaced() {
   if (!order) {
     return <main className="container py-5"><div className="ta-card"><Empty icon="bi-receipt" title="Pesanan tidak ditemukan" /></div></main>;
   }
-  const s = seller(order.sellerId);
-  const pv = provider(order.provider);
+  const s = seller(order.sellerId) || { name: "Penjual" };
+  const pv = provider(order.provider) || { name: "Kurir", logo: "TA", service: "" };
 
   return (
     <main className="container py-4">
@@ -22,7 +22,7 @@ export default function OrderPlaced() {
         <div className="col-lg-8">
           <div className="ta-card ta-card-pad text-center" style={{ padding: '2.5rem 1.5rem' }}>
             <i className="bi bi-check-circle-fill" style={{ fontSize: '2.6rem', color: 'var(--ta-ok)' }} />
-            <h1 className="ta-display mt-3 mb-1" style={{ fontSize: '1.6rem' }}>Pembayaran berhasil</h1>
+            <h1 className="ta-display mt-3 mb-1" style={{ fontSize: '1.6rem' }}>Pesanan berhasil dibuat</h1>
             <p className="ta-muted mb-0">
               Pesanan <strong className="ta-mono">{order.id}</strong> sudah diteruskan ke {s.name}.
               Anda akan diberi tahu begitu kios mengonfirmasi dan mengemas pesanannya.
@@ -50,7 +50,7 @@ export default function OrderPlaced() {
                     <ProviderLogo code={pv?.logo} />
                     <div className="ta-sm">
                       <strong>{pv?.name}</strong><br />
-                      <span className="ta-faint">{pv?.service} · {pv?.etaMin}-{pv?.etaMax} hari kerja</span>
+                      <span className="ta-faint">{pv?.service} Â· {pv?.etaMin}-{pv?.etaMax} hari kerja</span>
                     </div>
                   </div>
                 </div>
@@ -70,7 +70,7 @@ export default function OrderPlaced() {
                     <img src={p.images[0]} alt="" className="ta-thumb-lg" />
                     <div className="flex-grow-1">
                       <div className="ta-sm fw-semibold">{p.title}</div>
-                      <div className="ta-xs ta-faint">{it.variant} · {it.qty} pcs</div>
+                      <div className="ta-xs ta-faint">{it.variant} Â· {it.qty} pcs</div>
                     </div>
                     <div className="fw-semibold">{usd(p.price * it.qty)}</div>
                   </div>
@@ -78,7 +78,7 @@ export default function OrderPlaced() {
               })}
               <hr className="ta-sep my-3" />
               <div className="d-flex justify-content-between">
-                <span className="fw-semibold">Total dibayar</span>
+                <span className="fw-semibold">Total pesanan dibuat</span>
                 <span className="ta-display" style={{ fontSize: '1.3rem' }}>{usd(order.total)}</span>
               </div>
             </div>
@@ -110,3 +110,4 @@ export default function OrderPlaced() {
     </main>
   );
 }
+

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { COUNTRIES } from '../../data/mock';
+import { apiActions } from '../../api/marketplace';
 import ProductCard from '../../components/ProductCard';
 import { StatusBadge, Empty } from '../../components/ui';
 
@@ -72,7 +73,7 @@ export default function Account() {
           {tab === 'profile' && (
             <div className="ta-card">
               <div className="ta-card-head"><h6>Profil</h6>
-                <button className="btn btn-ta btn-sm" onClick={() => toast('Profil disimpan')}>Simpan perubahan</button></div>
+                <button className="btn btn-ta btn-sm" onClick={async () => { try { await apiActions.updateProfile(profile); toast('Profil disimpan'); } catch (e) { toast(e.message, 'danger'); } }}>Simpan perubahan</button></div>
               <div className="ta-card-pad">
                 <div className="row g-3">
                   <div className="col-md-6">
@@ -161,7 +162,7 @@ export default function Account() {
                 <button className="btn btn-ta btn-sm" onClick={() => toast('Formulir kartu dibuka (prototipe)', 'info')}>
                   <i className="bi bi-plus-lg me-1" />Tambah kartu</button></div>
               <div className="ta-card-pad d-grid gap-2">
-                {[['VISA', 'Visa •••• 4242', '09/29', true], ['MC', 'Mastercard •••• 8810', '03/28', false]].map(([chip, label, exp, def]) => (
+                {[['VISA', 'Visa â€¢â€¢â€¢â€¢ 4242', '09/29', true], ['MC', 'Mastercard â€¢â€¢â€¢â€¢ 8810', '03/28', false]].map(([chip, label, exp, def]) => (
                   <div key={label} className="ta-flat p-3 d-flex align-items-center gap-3">
                     <span className="ta-logo-chip">{chip}</span>
                     <div className="flex-grow-1">
@@ -191,7 +192,7 @@ export default function Account() {
                       <div>
                         <div className="fw-semibold">{v.code}</div>
                         <div className="ta-sm ta-muted">{v.label}</div>
-                        <div className="ta-xs ta-faint mt-1">{v.scope} · min. belanja {usd(v.minSpend)} · sampai {v.expiry}</div>
+                        <div className="ta-xs ta-faint mt-1">{v.scope} Â· min. belanja {usd(v.minSpend)} Â· sampai {v.expiry}</div>
                       </div>
                     </div>
                   </div>
@@ -207,7 +208,7 @@ export default function Account() {
                 {!state.wishlist.length && <Empty icon="bi-heart" title="Belum ada barang yang disimpan" />}
                 <div className="row g-3">
                   {state.wishlist.map(id => {
-                    const p = state.products.find(x => x.id === id);
+                    const p = state.products.find(x => x.id === id || String(x.dbId) === String(id));
                     return p ? <div key={id} className="col-6 col-md-4 col-lg-3"><ProductCard product={p} /></div> : null;
                   })}
                 </div>
@@ -239,3 +240,6 @@ export default function Account() {
     </main>
   );
 }
+
+
+

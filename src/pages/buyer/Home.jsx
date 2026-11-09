@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, num } from '../../data/store';
-import { CATEGORIES, HUBS, placeholder } from '../../data/mock';
+import { CATEGORIES, HUBS } from '../../data/mock';
 import ProductCard from '../../components/ProductCard';
 import { Rating, MarketCrest } from '../../components/ui';
 
@@ -50,13 +50,13 @@ export default function Home() {
           <div className="ta-hero ta-lattice ta-archband h-100 p-4 p-xl-5 d-flex flex-column justify-content-center">
             <div className="d-flex align-items-center gap-2 mb-2">
               <MarketCrest size={34} color="var(--ta-accent)" />
-              <div className="ta-hero-kicker mb-0">Tanah Abang · Jakarta</div>
+              <div className="ta-hero-kicker mb-0">Tanah Abang Â· Jakarta</div>
             </div>
             <h1 className="ta-display text-white mb-2" style={{ maxWidth: 420 }}>
               Pasar tekstil terbesar Asia Tenggara, dikirim sampai ke rumah Anda
             </h1>
             <p className="mb-4" style={{ color: 'rgba(255,255,255,.78)', maxWidth: 440 }}>
-              Harga grosir langsung dari kios. Kemasan siap ekspor, DHL · FedEx · EMS
+              Harga grosir langsung dari kios. Kemasan siap ekspor, DHL Â· FedEx Â· EMS
               ditangani jaringan gerai kami. Menjangkau 180+ negara tujuan.
             </p>
             <div className="d-flex gap-2 flex-wrap">
@@ -95,7 +95,7 @@ export default function Home() {
             <div className="ta-card ta-card-pad" style={{ background: 'var(--ta-accent-soft)', borderColor: '#eedfc2' }}>
               <div className="ta-eyebrow" style={{ color: 'var(--ta-accent)' }}>Voucher</div>
               <div className="fw-bold mt-1" style={{ fontSize: '1.05rem' }}>Diskon 10% di atas $50</div>
-              <div className="ta-xs ta-muted mb-2">Seluruh marketplace · berlaku sampai 31 Des 2026</div>
+              <div className="ta-xs ta-muted mb-2">Seluruh marketplace Â· berlaku sampai 31 Des 2026</div>
               <div className="ta-code-box bg-white">TANAHABANG10</div>
             </div>
             <div className="ta-card ta-card-pad">
@@ -148,11 +148,11 @@ export default function Home() {
             <div key={c.id} className="col-6 col-md-3">
               <Link to={`/search?cat=${encodeURIComponent(c.name)}`} className="ta-card ta-card-category ta-cat-tile d-block h-100 p-2" style={{ overflow: 'hidden' }}>
                 <div className="ta-arch-top">
-                  <img src={placeholder(c.id, c.name, 1.6)} alt="" style={{ width: '100%', height: 104, objectFit: 'cover', display: 'block' }} />
+                  <img src={c.image} alt="" style={{ width: '100%', height: 104, objectFit: 'cover', display: 'block' }} />
                 </div>
                 <div className="px-2 pt-2 pb-1 text-center">
                   <div className="fw-semibold ta-sm">{c.name}</div>
-                  <div className="ta-xs ta-faint text-truncate">{c.sub.slice(0, 3).join(' · ')}</div>
+                  <div className="ta-xs ta-faint text-truncate">{c.sub.slice(0, 3).join(' Â· ')}</div>
                 </div>
               </Link>
             </div>
@@ -223,7 +223,7 @@ export default function Home() {
                 <div className="ta-flat p-3 h-100">
                   <div className="ta-sm fw-semibold">{h.name.replace('TAGlobal ', '')}</div>
                   <div className="ta-xs ta-faint mt-1">{h.address}</div>
-                  <div className="ta-xs ta-muted mt-2"><i className="bi bi-clock me-1" />{h.open} · cut-off {h.cutoff}</div>
+                  <div className="ta-xs ta-muted mt-2"><i className="bi bi-clock me-1" />{h.open} Â· cut-off {h.cutoff}</div>
                 </div>
               </div>
             ))}
@@ -262,10 +262,11 @@ export default function Home() {
           </div>
           <div className="col-lg-4 text-lg-end">
             <Link to="/seller" className="btn btn-ta btn-lg">Buka Toko Saya</Link>
-            <div className="ta-xs ta-faint mt-2">Tanpa biaya pasang iklan · komisi 4% per pesanan</div>
+            <div className="ta-xs ta-faint mt-2">Tanpa biaya pasang iklan Â· komisi 4% per pesanan</div>
           </div>
         </div>
       </div>
     </main>
   );
 }
+

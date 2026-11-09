@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useStore, usd, num, quote } from '../../data/store';
 import { REVIEWS, COUNTRIES } from '../../data/mock';
@@ -22,7 +22,7 @@ export default function ProductDetail() {
     return <main className="container py-5"><div className="ta-card"><Empty icon="bi-box" title="Produk tidak ditemukan" /></div></main>;
   }
 
-  const s = seller(p.sellerId);
+  const s = seller(p.sellerId) || {name: "TAGlobal Seller", status: "pending"};
   const saved = state.wishlist.includes(p.id);
   const off = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
   const reviews = REVIEWS.filter(r => r.productId === p.id);
@@ -41,7 +41,7 @@ export default function ProductDetail() {
   const addToCart = goCheckout => {
     if (qty < p.moq) { toast(`Minimum pemesanan ${p.moq} pcs`, 'warn'); return; }
     dispatch({ type: 'cart:add', productId: p.id, qty, variant: variantLabel });
-    toast(`${qty} × ${p.title.slice(0, 28)}… masuk keranjang`);
+    toast(`${qty} Ã— ${p.title.slice(0, 28)}â€¦ masuk keranjang`);
     if (goCheckout) nav('/cart');
   };
 
@@ -60,7 +60,7 @@ export default function ProductDetail() {
         <div className="col-lg-5">
           <div className="ta-card" style={{ overflow: 'hidden' }}>
             <div style={{ position: 'relative', aspectRatio: '1/1', background: 'var(--ta-line-soft)' }}>
-              <img src={p.images[img]} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={p.images?.[img] || `https://placehold.co/600x600?text=${encodeURIComponent(p.title)}`} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               {off > 0 && <span className="ta-ribbon" style={{ fontSize: '.8rem', padding: '.2rem .5rem' }}>-{off}% grosir</span>}
             </div>
             <div className="d-flex gap-2 p-3">
@@ -102,7 +102,7 @@ export default function ProductDetail() {
           <div className="d-flex align-items-center gap-3 mt-2 mb-3 flex-wrap">
             <Rating value={p.rating} count={p.reviews} />
             <span className="ta-sm ta-faint">{num(p.sold)} terjual ke seluruh dunia</span>
-            <span className="ta-sm ta-faint">·</span>
+            <span className="ta-sm ta-faint">Â·</span>
             <span className="ta-sm ta-faint">stok {num(p.stock)}</span>
           </div>
 
@@ -113,7 +113,7 @@ export default function ProductDetail() {
                 const on = unit === t.price;
                 return (
                   <div key={t.from} className="col-4">
-                    <div className="ta-xs ta-faint">{t.to ? `${t.from} – ${t.to} pcs` : `${t.from}+ pcs`}</div>
+                    <div className="ta-xs ta-faint">{t.to ? `${t.from} â€“ ${t.to} pcs` : `${t.from}+ pcs`}</div>
                     <div className="ta-price" style={{ color: on ? 'var(--ta-brand)' : 'var(--ta-ink)' }}>{usd(t.price)}</div>
                     {on && <div className="ta-xs fw-semibold" style={{ color: 'var(--ta-brand)' }}>Harga Anda</div>}
                   </div>
@@ -155,7 +155,7 @@ export default function ProductDetail() {
             <div className="col">
               <label className="form-label">Subtotal pesanan</label>
               <div className="ta-display" style={{ fontSize: '1.5rem' }}>{usd(unit * qty)}</div>
-              <div className="ta-xs ta-faint">{qty} × {usd(unit)} · {(p.weight * qty).toFixed(2)} kg</div>
+              <div className="ta-xs ta-faint">{qty} Ã— {usd(unit)} Â· {(p.weight * qty).toFixed(2)} kg</div>
             </div>
           </div>
 
@@ -186,7 +186,7 @@ export default function ProductDetail() {
                       <ProviderLogo code={x.logo} />
                       <div className="flex-grow-1">
                         <div className="ta-sm fw-semibold">{x.name}</div>
-                        <div className="ta-xs ta-faint">{x.service} · {x.etaMin}-{x.etaMax} hari kerja</div>
+                        <div className="ta-xs ta-faint">{x.service} Â· {x.etaMin}-{x.etaMax} hari kerja</div>
                       </div>
                       <div className="text-end">
                         <div className="fw-semibold">{usd(cost)}</div>
@@ -231,7 +231,7 @@ export default function ProductDetail() {
                 <Link to={`/search?seller=${s.id}`} className="fw-semibold" style={{ color: 'var(--ta-ink)' }}>{s.name}</Link>
                 {s.status === 'verified' && <span className="ta-crest"><i className="bi bi-patch-check-fill" />Terverifikasi</span>}
               </div>
-              <div className="ta-xs ta-faint">{s.block} · dikirim dari Jakarta, Indonesia</div>
+              <div className="ta-xs ta-faint">{s.block} Â· dikirim dari Jakarta, Indonesia</div>
             </div>
             <div className="d-flex gap-3 ta-xs text-center">
               <div><div className="fw-bold" style={{ fontSize: '.95rem' }}>{s.rating}</div><div className="ta-faint">rating</div></div>
@@ -313,7 +313,7 @@ export default function ProductDetail() {
                 {[
                   ['bi-file-earmark-text', 'Dokumen bea cukai', 'Invoice komersial, packing list dan deklarasi kode HS dibuat TAGlobal dan ditempel pada karton.'],
                   ['bi-shop-window', 'Konsolidasi di gerai', 'Penjual mengantar paket ke gerai di bloknya; hub kami mengonsolidasi dan menyerahkan ke kurir sore harinya.'],
-                  ['bi-cash-coin', 'Bea masuk & pajak', 'Dikirim dengan skema DAP — bea masuk dan PPN lokal dibayar pembeli saat barang tiba.'],
+                  ['bi-cash-coin', 'Bea masuk & pajak', 'Dikirim dengan skema DAP â€” bea masuk dan PPN lokal dibayar pembeli saat barang tiba.'],
                 ].map(([i, t, d]) => (
                   <div key={t} className="col-md-4">
                     <i className={`bi ${i}`} style={{ fontSize: '1.3rem', color: 'var(--ta-brand)' }} />
@@ -350,7 +350,7 @@ export default function ProductDetail() {
                     <div className="d-flex align-items-center gap-2">
                       <span className="ta-avatar">{r.buyer.slice(0, 2).toUpperCase()}</span>
                       <div>
-                        <div className="ta-sm fw-semibold">{r.buyer} <span className="ta-xs ta-faint fw-normal">· {r.country}</span></div>
+                        <div className="ta-sm fw-semibold">{r.buyer} <span className="ta-xs ta-faint fw-normal">Â· {r.country}</span></div>
                         <Rating value={r.rating} />
                       </div>
                       <span className="ms-auto ta-xs ta-faint">{r.date}</span>
@@ -375,3 +375,4 @@ export default function ProductDetail() {
     </main>
   );
 }
+

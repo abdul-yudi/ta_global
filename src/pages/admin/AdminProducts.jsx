@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { CATEGORIES } from '../../data/mock';
@@ -29,13 +29,13 @@ export default function AdminProducts() {
 
   const setStatus = (p, status, label) => {
     dispatch({ type: 'product:update', product: { id: p.id, status } });
-    toast(`${p.title.slice(0, 30)}… ${label}`, status === 'rejected' ? 'warn' : 'ok');
+    toast(`${p.title.slice(0, 30)}â€¦ ${label}`, status === 'rejected' ? 'warn' : 'ok');
   };
 
   return (
     <>
       <PageHead eyebrow="Marketplace" title="Produk"
-        sub="Seluruh produk dari semua toko — moderasi, ubah atau hapus">
+        sub="Seluruh produk dari semua toko â€” moderasi, ubah atau hapus">
         <select className="form-select form-select-sm" style={{ width: 190 }} value={cat}
           onChange={e => { setCat(e.target.value); setPage(1); }}>
           <option value="">Semua kategori</option>
@@ -167,7 +167,7 @@ export default function AdminProducts() {
             <button className="btn btn-ta-outline btn-sm" onClick={() => setEdit(null)}>Batal</button>
             <button className="btn btn-ta btn-sm" onClick={() => {
               dispatch({ type: 'product:update', product: edit });
-              toast('Produk diperbarui — penjual diberi tahu adanya perubahan oleh admin');
+              toast('Produk diperbarui â€” penjual diberi tahu adanya perubahan oleh admin');
               setEdit(null);
             }}>Simpan perubahan</button>
           </>
@@ -224,9 +224,12 @@ export default function AdminProducts() {
       </Modal>
 
       <ConfirmDialog open={!!del} onClose={() => setDel(null)} title="Hapus produk ini?"
-        body={`“${del?.title}” akan dihapus dari marketplace dan penjual akan diberi tahu.`}
+        body={`â€œ${del?.title}â€ akan dihapus dari marketplace dan penjual akan diberi tahu.`}
         confirmLabel="Hapus"
         onConfirm={() => { dispatch({ type: 'product:delete', productId: del.id }); toast('Produk dihapus', 'warn'); setDel(null); }} />
     </>
   );
 }
+
+
+

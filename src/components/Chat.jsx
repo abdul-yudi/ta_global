@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import $ from 'jquery';
 import { useStore } from '../data/store';
+import { api } from '../api/client';
 import { Empty } from './ui';
 
 const QUICK = {
@@ -12,17 +13,17 @@ const QUICK = {
 /* Teks antarmuka chat */
 const T = {
   searchPh: 'Cari percakapan', noMatch: 'Tidak ada hasil', none: 'Belum ada percakapan',
-  online: 'Sedang online', about: s => `Percakapan tentang ${s}`, writePh: 'Tulis pesan…',
+  online: 'Sedang online', about: s => `Percakapan tentang ${s}`, writePh: 'Tulis pesanâ€¦',
   send: 'Kirim', attach: 'Detail pesanan dilampirkan ke percakapan', report: 'Percakapan dilaporkan ke CS TAGlobal',
   picker: 'Pemilih gambar (prototipe)', sent: 'Pesan terkirim',
-  footer: 'Lakukan percakapan di dalam TAGlobal — pembayaran di luar platform tidak dilindungi jaminan pembeli.',
+  footer: 'Lakukan percakapan di dalam TAGlobal â€” pembayaran di luar platform tidak dilindungi jaminan pembeli.',
   roleAdmin: 'CS TAGlobal', roleSeller: 'Penjual', roleBuyer: 'Pembeli',
 };
 
 export default function Chat({ role = 'buyer', filter }) {
   const { state, dispatch, toast } = useStore();
   const t = T;
-  const threads = filter ? state.threads.filter(filter) : state.threads;
+  const threads = (filter ? state.threads.filter(filter) : state.threads).filter(t => Number.isInteger(Number(t.id)));
   const [activeId, setActiveId] = useState(threads[0]?.id);
   const [text, setText] = useState('');
   const [search, setSearch] = useState('');
@@ -110,7 +111,7 @@ export default function Chat({ role = 'buyer', filter }) {
                 <div className="flex-grow-1" style={{ minWidth: 0 }}>
                   <div className="ta-sm fw-semibold text-truncate">{active.with}</div>
                   <div className="ta-xs ta-faint text-truncate">
-                    {active.online ? <><span className="ta-dot me-1" style={{ background: 'var(--ta-ok)' }} />{t.online} · </> : ''}
+                    {active.online ? <><span className="ta-dot me-1" style={{ background: 'var(--ta-ok)' }} />{t.online} Â· </> : ''}
                     {active.subject}
                   </div>
                 </div>
@@ -158,3 +159,4 @@ export default function Chat({ role = 'buyer', filter }) {
     </div>
   );
 }
+

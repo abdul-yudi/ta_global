@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { PageHead, Card, StatusBadge, ProviderLogo, Empty, FakeQR, Modal } from '../../components/ui';
@@ -23,11 +23,11 @@ export default function SellerDropoff() {
     });
   };
 
-  const confirmDrop = () => {
-    manifest.orders.forEach(o => {
+  const confirmDrop = async () => {
+    for (const o of manifest.orders) {
       const awb = (provider(o.provider)?.code || 'TA') + Math.floor(1000000000 + Math.random() * 8999999999);
-      dispatch({ type: 'order:status', orderId: o.id, status: 'at_hub', stage: 2, awb });
-    });
+      await dispatch({ type: 'order:status', orderId: o.id, status: 'at_hub', stage: 2, awb });
+    }
     toast(`${manifest.orders.length} paket diterima di ${myHub.name.replace('TAGlobal Gerai - ', '')}`);
     setManifest(null);
     setSel([]);
@@ -36,7 +36,7 @@ export default function SellerDropoff() {
   return (
     <>
       <PageHead eyebrow="Pengiriman" title="Antar ke gerai"
-        sub="Bawa paket yang sudah dikemas ke loket TAGlobal di blok Anda — urusan ekspor kami yang tangani">
+        sub="Bawa paket yang sudah dikemas ke loket TAGlobal di blok Anda â€” urusan ekspor kami yang tangani">
         <Link to="/seller/orders" className="btn btn-ta-outline">Kembali ke pesanan</Link>
         <button className="btn btn-ta" onClick={createManifest} disabled={!sel.length}>
           <i className="bi bi-upc-scan me-1" />Buat kode antar ({sel.length})
@@ -73,7 +73,7 @@ export default function SellerDropoff() {
                       return p ? <img key={it.productId} src={p.images[0]} alt="" className="ta-thumb" /> : null;
                     })}
                     <div className="ta-xs ta-muted">
-                      {o.items.reduce((a, i) => a + i.qty, 0)} pcs · {o.weight} kg · ke {o.city}, {o.country}
+                      {o.items.reduce((a, i) => a + i.qty, 0)} pcs Â· {o.weight} kg Â· ke {o.city}, {o.country}
                     </div>
                   </div>
                 </div>
@@ -118,7 +118,7 @@ export default function SellerDropoff() {
               {[
                 ['bi-box', 'Kardus dua lapis', 'Pakai kardus ekspor untuk paket di atas 5 kg. Plastik polybag hanya untuk barang lunak di bawah 2 kg.'],
                 ['bi-tag', 'Satu label per paket', 'Cetak label antar dan tempel rata di sisi terlebar. Jangan menutupi kode QR.'],
-                ['bi-droplet', 'Pelindung lembap', 'Tekstil harus dibungkus plastik sebelum dikardus — udara lembap di hub bisa menodai kain terang.'],
+                ['bi-droplet', 'Pelindung lembap', 'Tekstil harus dibungkus plastik sebelum dikardus â€” udara lembap di hub bisa menodai kain terang.'],
                 ['bi-clock', 'Cut-off 15:00', `${myHub?.name.replace('TAGlobal Gerai - ', '')} menutup penerimaan pukul ${myHub?.cutoff}. Lewat jam itu paket berangkat hari kerja berikutnya.`],
               ].map(([i, t, d]) => (
                 <div key={t} className="col-md-6 d-flex gap-3">
@@ -184,7 +184,7 @@ export default function SellerDropoff() {
             <Card title="Cara kerja di loket">
               <ol className="ps-3 mb-0 ta-sm ta-muted">
                 <li className="mb-2">Buat satu kode antar untuk semua paket dalam satu kali antaran.</li>
-                <li className="mb-2">Tunjukkan QR di loket — petugas memindainya sekali.</li>
+                <li className="mb-2">Tunjukkan QR di loket â€” petugas memindainya sekali.</li>
                 <li className="mb-2">Tiap paket ditimbang, difoto dan diberi nomor resi.</li>
                 <li className="mb-2">Hub mengonsolidasi dan menyerahkan ke kurir sore harinya.</li>
                 <li>Dana Anda dicairkan setelah pemindaian tercatat.</li>
@@ -250,3 +250,4 @@ export default function SellerDropoff() {
     </>
   );
 }
+

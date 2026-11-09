@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useStore, num, usd, quote } from '../../data/store';
 import { CATEGORIES, COUNTRIES } from '../../data/mock';
@@ -71,7 +71,7 @@ export default function Browse() {
   const shopFor = sellerId ? seller(sellerId) : null;
 
   const activeFilters = [
-    q && { k: 'q', label: `“${q}”` },
+    q && { k: 'q', label: `â€œ${q}â€` },
     cat && { k: 'cat', label: cat },
     sellerId && { k: 'seller', label: shopFor?.name },
   ].filter(Boolean);
@@ -93,7 +93,7 @@ export default function Browse() {
               <h2 style={{ fontSize: '1.05rem', margin: 0 }}>{shopFor.name}</h2>
               {shopFor.status === 'verified' && <span className="ta-crest"><i className="bi bi-patch-check-fill" />Terverifikasi</span>}
             </div>
-            <div className="ta-xs ta-faint">{shopFor.block} · {shopFor.country} · bergabung {shopFor.joined}</div>
+            <div className="ta-xs ta-faint">{shopFor.block} Â· {shopFor.country} Â· bergabung {shopFor.joined}</div>
           </div>
           <div className="d-flex gap-4 ta-sm">
             <div><div className="ta-xs ta-faint">Rating</div><Rating value={shopFor.rating} /></div>
@@ -144,14 +144,14 @@ export default function Browse() {
               <div className="d-flex align-items-center gap-2">
                 <input className="form-control form-control-sm" placeholder="Min" value={price.min}
                   onChange={e => { setPrice(p => ({ ...p, min: e.target.value.replace(/\D/g, '') })); setPage(1); }} />
-                <span className="ta-faint">–</span>
+                <span className="ta-faint">â€“</span>
                 <input className="form-control form-control-sm" placeholder="Maks" value={price.max}
                   onChange={e => { setPrice(p => ({ ...p, max: e.target.value.replace(/\D/g, '') })); setPage(1); }} />
               </div>
               <div className="d-flex gap-1 mt-2 flex-wrap">
                 {[['0', '5'], ['5', '15'], ['15', '40'], ['40', '']].map(([a, b]) => (
                   <button key={a} className="ta-chip" onClick={() => { setPrice({ min: a, max: b }); setPage(1); }}>
-                    ${a}{b ? `–$${b}` : '+'}
+                    ${a}{b ? `â€“$${b}` : '+'}
                   </button>
                 ))}
               </div>
@@ -202,7 +202,7 @@ export default function Browse() {
               <div className="fw-semibold">{num(results.length)} produk</div>
               <div className="ta-xs ta-faint">
                 {activeFilters.length
-                  ? <>Disaring berdasarkan {activeFilters.map(f => f.label).join(' · ')}</>
+                  ? <>Disaring berdasarkan {activeFilters.map(f => f.label).join(' Â· ')}</>
                   : 'Dari seluruh kios Tanah Abang yang terverifikasi'}
               </div>
             </div>
@@ -255,7 +255,7 @@ export default function Browse() {
                       <Link to={`/product/${p.id}`} className="fw-semibold d-block" style={{ color: 'var(--ta-ink)' }}>{p.title}</Link>
                       <div className="d-flex align-items-center gap-2 mt-1">
                         <Rating value={p.rating} count={p.reviews} />
-                        <span className="ta-xs ta-faint">· {num(p.sold)} terjual</span>
+                        <span className="ta-xs ta-faint">Â· {num(p.sold)} terjual</span>
                       </div>
                       <div className="ta-sm ta-muted mt-2" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {p.desc}
@@ -284,3 +284,5 @@ export default function Browse() {
     </main>
   );
 }
+
+
