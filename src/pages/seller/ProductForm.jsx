@@ -1,8 +1,9 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useStore, usd } from '../../data/store';
 import { CATEGORIES, placeholder } from '../../data/mock';
 import { PageHead, Card, ProviderLogo } from '../../components/ui';
+import { apiActions } from '../../api/marketplace';
 
 const emptyProduct = {
   title: '', category: CATEGORIES[0].name, sub: CATEGORIES[0].sub[0], sku: '',
@@ -40,6 +41,8 @@ export default function ProductForm() {
   const [images, setImages] = useState(existing ? existing.images : []);
   const [carriers, setCarriers] = useState(state.sellerShipping);
   const [newTag, setNewTag] = useState('');
+  const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
 
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
   const subs = useMemo(() => CATEGORIES.find(c => c.name === f.category)?.sub || [], [f.category]);
@@ -50,6 +53,27 @@ export default function ProductForm() {
   }, [f, images]);
 
   const addMockImage = () => {
+
+
+  const handleUploadFile = async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploading(true);
+      const res = await apiActions.uploadImage(file);
+      if (res?.url) {
+        setImages(im => [...im, res.url]);
+        toast('Foto berhasil diunggah ke server', 'info');
+      }
+    } catch (err) {
+      console.error('Upload failed, falling back to mock image', err);
+      toast('Upload gagal, menggunakan gambar placeholder', 'warn');
+      addMockImage();
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
     setImages(im => [...im, placeholder(f.title + im.length + Math.random(), f.title || 'TA')]);
     toast('Foto ditambahkan ke galeri', 'info');
   };
@@ -163,10 +187,22 @@ export default function ProductForm() {
 
           {/* ---------- media ---------- */}
           <Card title="2 Â· Foto & media" action={<span className="ta-xs ta-faint">{images.length}/8 foto</span>}>
-            <div className="ta-dropzone mb-3" onClick={addMockImage} role="button">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleUploadFile}
+            />
+            <div className="ta-dropzone mb-3" onClick={() => fileInputRef.current?.click()} role="button">
               <i className="bi bi-cloud-arrow-up" style={{ fontSize: '1.6rem' }} />
-              <div className="fw-semibold mt-2">Tarik foto ke sini atau klik untuk menambah</div>
-              <div className="ta-xs ta-faint">JPG atau PNG, rasio 1:1, minimal 800Ã—800 px, latar putih atau netral</div>
+              <div className="fw-semibold mt-2">{uploading ? 'Mengunggah foto...' : 'Klik untuk memilih atau mengunggah foto produk'}</div>
+              <div className="ta-xs ta-faint">JPG atau PNG, rasio 1:1, minimal 800×800 px, latar putih atau netral</div>
+              <div className="mt-2">
+                <button type="button" className="btn btn-sm btn-ta-ghost" onClick={e => { e.stopPropagation(); addMockImage(); }}>
+                  <i className="bi bi-magic me-1" /> Pakai foto placeholder
+                </button>
+              </div>
             </div>
             <div className="row g-2">
               {images.map((src, i) => (

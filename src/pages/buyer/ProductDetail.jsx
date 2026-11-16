@@ -1,7 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useStore, usd, num, quote } from '../../data/store';
 import { REVIEWS, COUNTRIES } from '../../data/mock';
+import { apiActions } from '../../api/marketplace';
 import ProductCard from '../../components/ProductCard';
 import { Rating, QtyStepper, ProviderLogo, Empty } from '../../components/ui';
 
@@ -25,7 +26,41 @@ export default function ProductDetail() {
   const s = seller(p.sellerId) || {name: "TAGlobal Seller", status: "pending"};
   const saved = state.wishlist.includes(p.id);
   const off = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
-  const reviews = REVIEWS.filter(r => r.productId === p.id);
+  const [reviews, setReviews] = useState(() => REVIEWS.filter(r => r.productId === p.id));
+  const [newReviewText, setNewReviewText] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (p?.id) {
+      apiActions.getProductReviews(p.dbId || p.id)
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) setReviews(data);
+        })
+        .catch(() => {});
+    }
+  }, [p?.id, p?.dbId]);
+
+  const submitReview = async e => {
+    e.preventDefault();
+    if (!state.account) { toast('Masuk untuk menulis ulasan', 'warn'); return; }
+    if (!newReviewText.trim()) { toast('Tulis komentar ulasan Anda', 'warn'); return; }
+    setSubmittingReview(true);
+    try {
+      const created = await apiActions.createProductReview(p.dbId || p.id, {
+        rating: newReviewRating,
+        text: newReviewText.trim(),
+        variant: variantLabel
+      });
+      setReviews(prev => [created, ...prev]);
+      setNewReviewText('');
+      toast('Ulasan berhasil dikirim!');
+    } catch (err) {
+      toast(err.message, 'danger');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
   const related = state.products.filter(x => x.category === p.category && x.id !== p.id && x.status === 'active').slice(0, 6);
   const availableProviders = state.providers.filter(x => x.active && state.sellerShipping[x.id]);
   const shipCost = quote(carrier, state.providers, p.weight * qty);
@@ -344,6 +379,23 @@ export default function ProductDetail() {
                 </div>
               </div>
               <div className="col-lg-9">
+                {state.account && (
+                  <form onSubmit={submitReview} className="ta-card ta-card-pad mb-4">
+                    <h6 className="mb-2">Tulis Ulasan Produk</h6>
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      <span className="ta-sm">Rating:</span>
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <button key={star} type="button" className="btn btn-sm p-0 border-0" onClick={() => setNewReviewRating(star)}>
+                          <i className={`bi ${star <= newReviewRating ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`} style={{ fontSize: '1.2rem' }} />
+                        </button>
+                      ))}
+                    </div>
+                    <textarea className="form-control mb-2" rows="2" placeholder="Bagikan pengalaman Anda tentang kualitas dan produk ini..." value={newReviewText} onChange={e => setNewReviewText(e.target.value)} />
+                    <button type="submit" className="btn btn-ta btn-sm" disabled={submittingReview}>
+                      {submittingReview ? 'Mengirim...' : 'Kirim Ulasan'}
+                    </button>
+                  </form>
+                )}
                 {reviews.length === 0 && <Empty icon="bi-chat-square-quote" title="Belum ada ulasan tertulis untuk produk ini" />}
                 {reviews.map(r => (
                   <div key={r.id} className="pb-3 mb-3" style={{ borderBottom: '1px solid var(--ta-line-soft)' }}>

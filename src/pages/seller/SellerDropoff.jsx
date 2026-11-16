@@ -1,7 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, num } from '../../data/store';
 import { PageHead, Card, StatusBadge, ProviderLogo, Empty, FakeQR, Modal } from '../../components/ui';
+import { apiActions } from '../../api/marketplace';
 
 export default function SellerDropoff() {
   const { state, sellerOrders, provider, hub, product, dispatch, toast } = useStore();
@@ -15,12 +16,31 @@ export default function SellerDropoff() {
   const selected = ready.filter(o => sel.includes(o.id));
   const totalWeight = selected.reduce((a, o) => a + parseFloat(o.weight), 0);
 
-  const createManifest = () => {
+  const createManifest = async () => {
     if (!sel.length) { toast('Pilih minimal satu paket', 'warn'); return; }
-    setManifest({
-      code: 'DO-' + Math.floor(100000 + Math.random() * 899999),
-      orders: selected, slot, hub: myHub,
-    });
+    try {
+      const res = await apiActions.createDropoffManifest({
+        hubId: myHub?.id || state.sellerHub,
+        slot,
+        orderIds: sel,
+        totalWeight,
+      });
+      setManifest({
+        code: res?.code || ('DO-' + Math.floor(100000 + Math.random() * 899999)),
+        orders: selected,
+        slot,
+        hub: myHub,
+      });
+      toast('Kode antar berhasil dibuat', 'info');
+    } catch (err) {
+      console.error('Failed to create manifest on server, using local fallback', err);
+      setManifest({
+        code: 'DO-' + Math.floor(100000 + Math.random() * 899999),
+        orders: selected,
+        slot,
+        hub: myHub,
+      });
+    }
   };
 
   const confirmDrop = async () => {

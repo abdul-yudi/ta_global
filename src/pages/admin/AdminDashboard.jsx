@@ -1,25 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, usd0, num } from '../../data/store';
 import { ADMIN_ANALYTICS } from '../../data/mock';
 import { PageHead, Stat, Card, AreaChart, BarChart, Donut, BarRow, StatusBadge, ProviderLogo } from '../../components/ui';
+import { apiActions } from '../../api/marketplace';
 
 const SELLER_STATUS_ID = { verified: 'terverifikasi', pending: 'menunggu', suspended: 'ditangguhkan' };
 
 export default function AdminDashboard() {
   const { state, seller } = useStore();
-  const a = ADMIN_ANALYTICS;
+  const [data, setData] = useState(ADMIN_ANALYTICS);
 
-  const gmv = a.gmvSeries.reduce((x, y) => x + y, 0);
+  useEffect(() => {
+    let active = true;
+    apiActions.getAdminAnalytics()
+      .then(res => { if (active && res) setData(res); })
+      .catch(err => console.error('Failed to load admin analytics', err));
+    return () => { active = false; };
+  }, []);
+
+  const a = data || ADMIN_ANALYTICS;
+  const labels = a.labels || ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'];
+  const gmvSeries = a.gmvSeries?.length ? a.gmvSeries : Array(7).fill(0);
+  const newSellers = a.newSellers?.length ? a.newSellers : a.sellersSeries?.length ? a.sellersSeries : Array(7).fill(0);
+  const categorySplit = a.categorySplit || [];
+  const gmv = gmvSeries.reduce((x, y) => x + y, 0);
+  const avgDailyGmv = gmvSeries.length > 0 ? gmv / gmvSeries.length : 0;
+
   const pendingSellers = state.sellers.filter(s => s.status === 'pending');
   const reviewProducts = state.products.filter(p => p.status === 'review' || p.status === 'rejected');
   const brokenApis = state.providers.filter(p => p.apiStatus === 'error');
-  const maxHub = Math.max(...state.hubs.map(h => h.intake30d));
+  const maxHub = state.hubs.length ? Math.max(...state.hubs.map(h => h.intake30d || 0), 1) : 1;
 
   return (
     <>
       <PageHead eyebrow="Super Admin" title="Ringkasan marketplace"
-        sub="Kamis, 4 November 2026 · seluruh angka diambil dari API tiruan">
+        sub="Pusat kendali dan performa marketplace ekspor TA Global">
         <Link to="/admin/broadcast" className="btn btn-ta-outline"><i className="bi bi-megaphone me-1" />Siaran</Link>
         <Link to="/admin/providers" className="btn btn-ta"><i className="bi bi-truck me-1" />Jasa kirim</Link>
       </PageHead>
@@ -70,7 +86,7 @@ export default function AdminDashboard() {
       <div className="row g-3 mb-3">
         <div className="col-md-6 col-xl-3"><Stat label="GMV — 14 hari" value={usd0(gmv)} delta="14,2%" hint="vs periode sebelumnya" icon="bi-graph-up" /></div>
         <div className="col-md-6 col-xl-3"><Stat label="Pendapatan komisi" value={usd0(gmv * 0.04)} delta="14,2%" hint="komisi 4%" icon="bi-percent" /></div>
-        <div className="col-md-6 col-xl-3"><Stat label="Penjual aktif" value={num(state.sellers.filter(s => s.status === 'verified').length * 179)} delta="13 baru" hint="minggu ini" icon="bi-shop" /></div>
+        <div className="col-md-6 col-xl-3"><Stat label="Penjual aktif" value={num(state.sellers.filter(s => s.status === 'verified').length * 179 || 179)} delta="13 baru" hint="minggu ini" icon="bi-shop" /></div>
         <div className="col-md-6 col-xl-3"><Stat label="Paket diekspor" value={num(14286)} delta="9,8%" hint="30 hari terakhir" icon="bi-airplane" /></div>
       </div>
 
@@ -79,11 +95,11 @@ export default function AdminDashboard() {
           <Card title="Nilai transaksi bruto — 14 hari terakhir" pad={false}
             action={<span className="ta-xs ta-faint">USD, seluruh toko</span>}>
             <div className="p-3">
-              <AreaChart series={a.gmvSeries} labels={a.labels} color="#0b3d2c" fmt={v => `$${(v / 1000).toFixed(0)}rb`} height={230} />
+              <AreaChart series={gmvSeries} labels={labels} color="#0b3d2c" fmt={v => `$${(v / 1000).toFixed(0)}rb`} height={230} />
             </div>
             <div className="row g-0" style={{ borderTop: '1px solid var(--ta-line-soft)' }}>
               {[
-                ['Rata-rata GMV harian', usd0(gmv / a.gmvSeries.length)],
+                ['Rata-rata GMV harian', usd0(avgDailyGmv)],
                 ['Pesanan / hari', num(1842)],
                 ['Rata-rata keranjang', usd(46.2)],
                 ['Tarif komisi', '4,0%'],
@@ -99,13 +115,13 @@ export default function AdminDashboard() {
 
         <div className="col-xl-4">
           <Card title="GMV per kategori">
-            <Donut data={a.categorySplit} center={{ value: usd0(gmv / 1000) + 'rb', label: 'GMV 14 hari' }} />
+            <Donut data={categorySplit} center={{ value: usd0(gmv / 1000) + 'rb', label: 'GMV 14 hari' }} />
           </Card>
         </div>
 
         <div className="col-xl-4">
           <Card title="Penjual baru bergabung" pad={false}>
-            <div className="p-3"><BarChart series={a.newSellers} labels={a.labels} color="#b8863b" height={160} /></div>
+            <div className="p-3"><BarChart series={newSellers} labels={labels} color="#b8863b" height={160} /></div>
           </Card>
         </div>
 

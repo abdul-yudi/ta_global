@@ -1,21 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, usd, usd0, num } from '../../data/store';
 import { SELLER_ANALYTICS } from '../../data/mock';
 import { PageHead, Stat, Card, AreaChart, Donut, BarRow, StatusBadge, ProviderLogo, Empty } from '../../components/ui';
+import { apiActions } from '../../api/marketplace';
 
 export default function SellerDashboard() {
   const { state, sellerOrders, product, seller, hub } = useStore();
   const me = seller(state.sellerId);
-  const a = SELLER_ANALYTICS;
+  const [data, setData] = useState(SELLER_ANALYTICS);
+
+  useEffect(() => {
+    let active = true;
+    apiActions.getSellerAnalytics()
+      .then(res => { if (active && res) setData(res); })
+      .catch(err => console.error('Failed to load seller analytics', err));
+    return () => { active = false; };
+  }, []);
+
+  const a = data || SELLER_ANALYTICS;
+  const labels = a.labels || ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'];
+  const revenueSeries = a.revenueSeries?.length ? a.revenueSeries : Array(14).fill(0);
+  const ordersSeries = a.ordersSeries?.length ? a.ordersSeries : Array(14).fill(0);
+  const visitorsSeries = a.visitorsSeries?.length ? a.visitorsSeries : Array(14).fill(0);
+  const topCountries = a.topCountries || [];
+  const providerSplit = a.providerSplit || [];
+  const revenue = revenueSeries[revenueSeries.length - 1] || 0;
+  const ordersToday = ordersSeries[ordersSeries.length - 1] || 0;
+  const visitorsToday = visitorsSeries[visitorsSeries.length - 1] || 0;
 
   const myProducts = state.products.filter(p => p.sellerId === state.sellerId);
   const pending = sellerOrders.filter(o => o.status === 'awaiting_acceptance');
   const toDrop = sellerOrders.filter(o => o.status === 'to_dropoff');
-  const revenue = a.revenueSeries[a.revenueSeries.length - 1];
   const unread = state.threads.reduce((x, t) => x + (t.unread || 0), 0);
   const lowStock = myProducts.filter(p => p.stock < 600);
-  const maxCountry = Math.max(...a.topCountries.map(c => c.revenue));
+  const maxCountry = topCountries.length ? Math.max(...topCountries.map(c => c.revenue || 0), 1) : 1;
+  const totalRev = revenueSeries.reduce((x, y) => x + y, 0);
+  const totalOrd = ordersSeries.reduce((x, y) => x + y, 0);
+  const aov = totalOrd > 0 ? totalRev / totalOrd : 0;
 
   return (
     <>
@@ -46,8 +68,8 @@ export default function SellerDashboard() {
       {/* ---------- KPIs ---------- */}
       <div className="row g-3 mb-3">
         <div className="col-md-6 col-xl-3"><Stat label="Omzet hari ini" value={usd0(revenue)} delta="18,0%" hint="vs kemarin" icon="bi-cash-stack" /></div>
-        <div className="col-md-6 col-xl-3"><Stat label="Pesanan hari ini" value={a.ordersSeries[a.ordersSeries.length - 1]} delta="17,1%" hint="vs kemarin" icon="bi-receipt" /></div>
-        <div className="col-md-6 col-xl-3"><Stat label="Pengunjung toko" value={num(a.visitorsSeries[a.visitorsSeries.length - 1])} delta="16,7%" hint="unik / 24 jam" icon="bi-people" /></div>
+        <div className="col-md-6 col-xl-3"><Stat label="Pesanan hari ini" value={ordersToday} delta="17,1%" hint="vs kemarin" icon="bi-receipt" /></div>
+        <div className="col-md-6 col-xl-3"><Stat label="Pengunjung toko" value={num(visitorsToday)} delta="16,7%" hint="unik / 24 jam" icon="bi-people" /></div>
         <div className="col-md-6 col-xl-3"><Stat label="Konversi" value="5,04%" delta="0,4 poin" deltaDir="down" hint="dilihat ke dibayar" icon="bi-funnel" /></div>
       </div>
 
@@ -57,13 +79,13 @@ export default function SellerDashboard() {
           <Card title="Omzet & pesanan — 14 hari terakhir" pad={false}
             action={<Link to="/seller/analytics" className="ta-xs">Analitik lengkap <i className="bi bi-chevron-right" style={{ fontSize: '.6rem' }} /></Link>}>
             <div className="p-3">
-              <AreaChart series={a.revenueSeries} labels={a.labels} fmt={v => `$${v / 1000 >= 1 ? (v / 1000).toFixed(0) + 'rb' : v}`} />
+              <AreaChart series={revenueSeries} labels={labels} fmt={v => `$${v / 1000 >= 1 ? (v / 1000).toFixed(0) + 'rb' : v}`} />
             </div>
             <div className="row g-0" style={{ borderTop: '1px solid var(--ta-line-soft)' }}>
               {[
-                ['Omzet 14 hari', usd0(a.revenueSeries.reduce((x, y) => x + y, 0))],
-                ['Pesanan 14 hari', num(a.ordersSeries.reduce((x, y) => x + y, 0))],
-                ['Rata-rata nilai pesanan', usd(a.revenueSeries.reduce((x, y) => x + y, 0) / a.ordersSeries.reduce((x, y) => x + y, 0))],
+                ['Omzet 14 hari', usd0(totalRev)],
+                ['Pesanan 14 hari', num(totalOrd)],
+                ['Rata-rata nilai pesanan', usd(aov)],
                 ['Pembeli berulang', '31%'],
               ].map(([l, v], i) => (
                 <div key={l} className="col-6 col-lg-3 p-3" style={{ borderRight: i < 3 ? '1px solid var(--ta-line-soft)' : 'none' }}>
@@ -147,7 +169,7 @@ export default function SellerDashboard() {
         {/* ---------- carrier split ---------- */}
         <div className="col-xl-4">
           <Card title="Komposisi kurir — 30 hari">
-            <Donut data={a.providerSplit} center={{ value: num(1218), label: 'paket' }} />
+            <Donut data={providerSplit} center={{ value: num(totalOrd), label: 'paket' }} />
             <hr className="ta-sep my-3" />
             <Link to="/seller/shipping" className="btn btn-ta-outline btn-sm w-100">
               <i className="bi bi-truck me-1" />Atur jasa kirim
@@ -158,7 +180,7 @@ export default function SellerDashboard() {
         {/* ---------- top destinations ---------- */}
         <div className="col-xl-5">
           <Card title="Negara tujuan teratas">
-            {a.topCountries.map(c => (
+            {topCountries.map(c => (
               <BarRow key={c.country} label={c.country} value={c.revenue} max={maxCountry} right={usd0(c.revenue)} />
             ))}
           </Card>

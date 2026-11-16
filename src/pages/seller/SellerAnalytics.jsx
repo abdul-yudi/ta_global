@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore, usd, usd0, num } from '../../data/store';
 import { SELLER_ANALYTICS } from '../../data/mock';
 import { PageHead, Stat, Card, AreaChart, BarChart, Donut, BarRow } from '../../components/ui';
+import { apiActions } from '../../api/marketplace';
 
 const RANGES = ['Hari ini', '7 hari', '14 hari', '30 hari', '90 hari'];
 const METRICS = [
@@ -12,14 +13,40 @@ const METRICS = [
 
 export default function SellerAnalytics() {
   const { state } = useStore();
-  const a = SELLER_ANALYTICS;
+  const [data, setData] = useState(SELLER_ANALYTICS);
   const [range, setRange] = useState('14 hari');
   const [metric, setMetric] = useState('revenue');
-  const m = METRICS.find(x => x.id === metric);
+
+  useEffect(() => {
+    let active = true;
+    apiActions.getSellerAnalytics()
+      .then(res => {
+        if (active && res) {
+          setData(res);
+        }
+      })
+      .catch(err => console.error('Failed to load seller analytics', err));
+    return () => { active = false; };
+  }, []);
+
+  const a = data || SELLER_ANALYTICS;
+  const labels = a.labels || ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'];
+  const revenueSeries = a.revenueSeries?.length ? a.revenueSeries : Array(14).fill(0);
+  const ordersSeries = a.ordersSeries?.length ? a.ordersSeries : Array(14).fill(0);
+  const visitorsSeries = a.visitorsSeries?.length ? a.visitorsSeries : Array(14).fill(0);
+  const topCountries = a.topCountries || [];
+  const funnel = a.funnel?.length ? a.funnel : [{ step: 'Dilihat', value: 0 }];
+  const providerSplit = a.providerSplit || [];
+  const m = METRICS.find(x => x.id === metric) || METRICS[0];
+  const seriesMap = { revenueSeries, ordersSeries, visitorsSeries };
+  const chartSeries = seriesMap[m.series] || revenueSeries;
 
   const myProducts = state.products.filter(p => p.sellerId === state.sellerId);
-  const maxCountry = Math.max(...a.topCountries.map(c => c.revenue));
-  const maxFunnel = a.funnel[0].value;
+  const maxCountry = topCountries.length ? Math.max(...topCountries.map(c => c.revenue || 0), 1) : 1;
+  const maxFunnel = funnel[0]?.value || 1;
+  const totalRev = revenueSeries.reduce((x, y) => x + y, 0);
+  const totalOrd = ordersSeries.reduce((x, y) => x + y, 0);
+  const aov = totalOrd > 0 ? totalRev / totalOrd : 0;
 
   return (
     <>
@@ -31,9 +58,9 @@ export default function SellerAnalytics() {
       </PageHead>
 
       <div className="row g-3 mb-3">
-        <div className="col-md-6 col-xl-3"><Stat label="Omzet kotor" value={usd0(a.revenueSeries.reduce((x, y) => x + y, 0))} delta="23,4%" hint={range} icon="bi-cash-stack" /></div>
-        <div className="col-md-6 col-xl-3"><Stat label="Pesanan dibayar" value={num(a.ordersSeries.reduce((x, y) => x + y, 0))} delta="19,8%" hint={range} icon="bi-receipt" /></div>
-        <div className="col-md-6 col-xl-3"><Stat label="Rata-rata nilai pesanan" value={usd(a.revenueSeries.reduce((x, y) => x + y, 0) / a.ordersSeries.reduce((x, y) => x + y, 0))} delta="3,1%" hint={range} icon="bi-tag" /></div>
+        <div className="col-md-6 col-xl-3"><Stat label="Omzet kotor" value={usd0(totalRev)} delta="23,4%" hint={range} icon="bi-cash-stack" /></div>
+        <div className="col-md-6 col-xl-3"><Stat label="Pesanan dibayar" value={num(totalOrd)} delta="19,8%" hint={range} icon="bi-receipt" /></div>
+        <div className="col-md-6 col-xl-3"><Stat label="Rata-rata nilai pesanan" value={usd(aov)} delta="3,1%" hint={range} icon="bi-tag" /></div>
         <div className="col-md-6 col-xl-3"><Stat label="Tingkat refund" value="0,8%" delta="0,2 poin" deltaDir="down" hint="makin kecil makin baik" icon="bi-arrow-counterclockwise" /></div>
       </div>
 
@@ -49,19 +76,19 @@ export default function SellerAnalytics() {
               </div>
             )}>
             <div className="p-3">
-              <AreaChart series={a[m.series]} labels={a.labels} fmt={m.fmt} height={230} />
+              <AreaChart series={chartSeries} labels={labels} fmt={m.fmt} height={230} />
             </div>
           </Card>
         </div>
 
         <div className="col-xl-4">
           <Card title="Corong konversi">
-            {a.funnel.map((f, i) => (
+            {funnel.map((f, i) => (
               <div key={f.step} className="mb-3">
                 <div className="d-flex justify-content-between ta-sm mb-1">
                   <span className="ta-muted">{f.step}</span>
                   <span><strong className="ta-num">{num(f.value)}</strong>
-                    {i > 0 && <span className="ta-xs ta-faint ms-1">({((f.value / a.funnel[i - 1].value) * 100).toFixed(1)}%)</span>}</span>
+                    {i > 0 && funnel[i - 1]?.value > 0 && <span className="ta-xs ta-faint ms-1">({((f.value / funnel[i - 1].value) * 100).toFixed(1)}%)</span>}</span>
                 </div>
                 <div className="ta-barrow-track"><span className="ta-barrow-fill" style={{ width: `${(f.value / maxFunnel) * 100}%` }} /></div>
               </div>
@@ -75,20 +102,20 @@ export default function SellerAnalytics() {
 
         <div className="col-xl-6">
           <Card title="Pesanan per hari" pad={false}>
-            <div className="p-3"><BarChart series={a.ordersSeries} labels={a.labels} /></div>
+            <div className="p-3"><BarChart series={ordersSeries} labels={labels} /></div>
           </Card>
         </div>
 
         <div className="col-xl-6">
           <Card title="Komposisi kurir">
-            <Donut data={a.providerSplit} center={{ value: num(1218), label: 'paket' }} />
+            <Donut data={providerSplit} center={{ value: num(totalOrd), label: 'paket' }} />
           </Card>
         </div>
 
         <div className="col-xl-6">
           <Card title="Omzet per negara tujuan" pad={false}>
             <div className="p-3">
-              {a.topCountries.map(c => (
+              {topCountries.map(c => (
                 <BarRow key={c.country} label={c.country} value={c.revenue} max={maxCountry} right={usd0(c.revenue)} />
               ))}
             </div>
@@ -96,12 +123,12 @@ export default function SellerAnalytics() {
               <table className="ta-table">
                 <thead><tr><th>Negara</th><th>Pesanan</th><th>Omzet</th><th>Rata-rata</th></tr></thead>
                 <tbody>
-                  {a.topCountries.map(c => (
+                  {topCountries.map(c => (
                     <tr key={c.country}>
                       <td className="ta-sm">{c.country}</td>
                       <td className="ta-num">{c.orders}</td>
                       <td className="ta-num">{usd0(c.revenue)}</td>
-                      <td className="ta-num">{usd(c.revenue / c.orders)}</td>
+                      <td className="ta-num">{usd(c.orders > 0 ? c.revenue / c.orders : 0)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -129,7 +156,7 @@ export default function SellerAnalytics() {
                         <td className="ta-num ta-sm">{num(views)}</td>
                         <td className="ta-num ta-sm">{num(p.sold)}</td>
                         <td className="ta-num ta-sm">{usd0(p.sold * p.price)}</td>
-                        <td><span className="ta-badge ta-badge-neutral">{((p.sold / views) * 100).toFixed(1)}%</span></td>
+                        <td><span className="ta-badge ta-badge-neutral">{views > 0 ? ((p.sold / views) * 100).toFixed(1) : '0'}%</span></td>
                       </tr>
                     );
                   })}

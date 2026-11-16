@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, num } from '../../data/store';
 import { PageHead, Card, ProviderLogo, Empty, Modal } from '../../components/ui';
+import { apiActions } from '../../api/marketplace';
 
-const LOGS = [
+const DEFAULT_LOGS = [
   ['08:30:12', 'DHL', 'POST /mydhlapi/rates', 200, '184 ms'],
   ['08:30:09', 'EMS', 'POST /ems/v2/rate', 200, '612 ms'],
   ['08:29:58', 'FEDEX', 'POST /rate/v1', 200, '221 ms'],
@@ -22,8 +23,27 @@ export default function AdminIntegrations() {
   const [draft, setDraft] = useState(null);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
+  const [logs, setLogs] = useState(DEFAULT_LOGS);
 
   const p = state.providers.find(x => x.id === sel) || state.providers[0];
+
+  useEffect(() => {
+    let active = true;
+    apiActions.getCarrierLogs()
+      .then(res => {
+        if (active && Array.isArray(res) && res.length) {
+          setLogs(res.map(l => [
+            l.time || l[0] || '08:00:00',
+            l.carrier || l[1] || 'LOGISTICS',
+            l.endpoint || l[2] || 'POST /api/rates',
+            l.status || l[3] || 200,
+            l.latency || l[4] || '150 ms',
+          ]));
+        }
+      })
+      .catch(err => console.error('Failed to load carrier logs', err));
+    return () => { active = false; };
+  }, []);
 
   const openEditor = () => setDraft({
     id: p.id, endpoint: p.endpoint, webhook: p.webhook, apiKey: '', apiMode: p.apiMode,
@@ -44,16 +64,24 @@ export default function AdminIntegrations() {
     setDraft(null);
   };
 
-  const runTest = () => {
+  const runTest = async () => {
     setTesting(true);
     setTestResult(null);
-    setTimeout(() => {
-      setTesting(false);
+    try {
+      const res = await apiActions.testCarrier({ code: p.code, endpoint: p.endpoint });
+      setTestResult({
+        ok: res?.ok ?? (p.apiStatus !== 'error' && p.apiStatus !== 'not_connected'),
+        text: res?.message || (res?.ok ? `Tarif diterima: $27.90 untuk 1,0 kg ke Dubai, AE · ${res?.latency || '184 ms'}` : 'HTTP 401 — kredensial ditolak kurir. Periksa API key dan nomor akun.'),
+      });
+    } catch (err) {
+      console.error('Test carrier error', err);
       const ok = p.apiStatus !== 'error' && p.apiStatus !== 'not_connected';
       setTestResult(ok
         ? { ok: true, text: 'Tarif diterima: $27.90 untuk 1,0 kg ke Dubai, AE · 184 ms' }
         : { ok: false, text: 'HTTP 401 — kredensial ditolak kurir. Periksa API key dan nomor akun.' });
-    }, 700);
+    } finally {
+      setTesting(false);
+    }
   };
 
   if (!p) {
@@ -227,7 +255,7 @@ export default function AdminIntegrations() {
               <table className="ta-table">
                 <thead><tr><th>Waktu</th><th>Kurir</th><th>Permintaan</th><th>Status</th><th>Latensi</th></tr></thead>
                 <tbody>
-                  {LOGS.map((l, i) => (
+                  {logs.map((l, i) => (
                     <tr key={i}>
                       <td className="ta-mono ta-xs">{l[0]}</td>
                       <td><span className="ta-logo-chip">{l[1]}</span></td>

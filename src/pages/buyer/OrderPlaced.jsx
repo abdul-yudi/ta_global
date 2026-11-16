@@ -78,7 +78,7 @@ export default function OrderPlaced() {
               })}
               <hr className="ta-sep my-3" />
               <div className="d-flex justify-content-between">
-                <span className="fw-semibold">Total pesanan dibuat</span>
+                <span className="fw-semibold">Subtotal barang</span>
                 <span className="ta-display" style={{ fontSize: '1.3rem' }}>{usd(order.total)}</span>
               </div>
             </div>
